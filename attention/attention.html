@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="ko">
 <head>
     <meta charset="UTF-8">
@@ -199,10 +199,7 @@
                     </div>
                 </div>
                  <p class="mt-4">인코더는 입력 시퀀스를 문맥 정보가 풍부한 연속적인 표현(벡터 시퀀스)으로 변환합니다. 디코더는 이 인코더의 출력을 참조하여 번역된 단어를 하나씩 생성합니다 (자기회귀 방식).</p>
-                 <div class="flex justify-center mt-8">
-                    <img src="/attention/Transformer.png" alt="Transformer 모델 아키텍처 다이어그램" class="max-w-full h-auto rounded-lg shadow-lg">
-                 </div>
-                 <p class="mt-4 text-center text-sm text-gray-600">위 그림은 Transformer 모델의 전체 아키텍처를 보여줍니다. 왼쪽은 인코더, 오른쪽은 디코더 스택입니다.</p>
+                 <p class="mt-4 text-center text-sm text-gray-600">Transformer 모델은 인코더-디코더 스택으로 구성됩니다. 인코더는 입력의 의미적 표현을 생성하고, 디코더는 이를 기반으로 번역을 생성합니다.</p>
             </div>
 
             <div class="mb-8 p-4 border rounded-lg bg-rose-50">
@@ -212,11 +209,11 @@
                     <h4 class="text-xl font-semibold mb-2 korean-title">스케일드 닷-프로덕트 어텐션 (Scaled Dot-Product Attention)</h4>
                     <p>가장 기본적인 어텐션 메커니즘입니다. 쿼리(Query, Q), 키(Key, K), 값(Value, V)이라는 세 가지 벡터를 입력받아 다음과 같이 계산합니다:</p>
                     <div class="math-formula bg-gray-100 rounded my-2">
-                        Attention(Q, K, V) = softmax(<span class="fraction"><span class="numerator">QK<sup>T</sup></span><span class="denominator"><span class="sqrt-symbol">&radic;</span><span class="overline">d<sub>k</sub></span></span></span>)V
+                        Attention(Q, K, V) = softmax($\frac{QK^T}{\sqrt{d_k}}$)V
                     </div>
                     <ul class="list-disc list-inside text-sm space-y-1">
-                        <li>Q와 K의 유사도를 계산하고 (<span class="font-mono">QK<sup>T</sup></span>),</li>
-                        <li><span class="font-mono">&radic;d<sub>k</sub></span>로 나누어 스케일링한 후 (기울기 소실 방지),</li>
+                        <li>Q와 K의 유사도를 계산하고 ($QK^T$),</li>
+                        <li>$\sqrt{d_k}$로 나누어 스케일링한 후 (기울기 소실 방지),</li>
                         <li>softmax 함수를 통해 가중치를 얻고,</li>
                         <li>이 가중치를 V에 곱하여 최종 어텐션 값을 얻습니다.</li>
                     </ul>
@@ -254,8 +251,8 @@
                     <p class="mb-2">Transformer는 단어들을 동시에 처리하기 때문에 RNN처럼 자연스럽게 단어의 순서 정보를 알 수 없습니다. 따라서 <span class="highlight">위치 인코딩</span>이라는 특별한 벡터를 단어 임베딩에 더하여 각 단어의 위치 정보를 알려줍니다.</p>
                     <p class="mb-2">논문에서는 사인(sin) 및 코사인(cos) 함수를 사용하여 고정된 위치 인코딩 값을 생성합니다:</p>
                     <div class="math-formula bg-gray-100 rounded text-sm">
-                        PE<sub>(pos, 2i)</sub> = sin(pos / 10000<sup>2i/d<sub>model</sub></sup>)<br/>
-                        PE<sub>(pos, 2i+1)</sub> = cos(pos / 10000<sup>2i/d<sub>model</sub></sup>)
+                        PE$_{(pos, 2i)}$ = sin(pos / 10000$^{2i/d_{model}}$)<br/>
+                        PE$_{(pos, 2i+1)}$ = cos(pos / 10000$^{2i/d_{model}}$)
                     </div>
                     <p class="text-xs mt-1">(pos: 단어 위치, i: 인코딩 벡터 차원)</p>
                     <p class="mt-2">이 방식은 모델이 상대적인 위치 관계를 쉽게 학습하고, 훈련 데이터보다 긴 문장에도 일반화할 수 있도록 돕습니다.</p>
@@ -270,7 +267,7 @@
                         </li>
                         <li>
                             <h4 class="text-lg font-semibold">잔차 연결 (Residual Connections) & 계층 정규화 (Layer Normalization)</h4>
-                            <p class="text-sm">각 하위 레이어(어텐션, 피드-포워드 네트워크)의 입력과 출력을 더하는 잔차 연결(<span class="font-mono">x + Sublayer(x)</span>)과 계층 정규화를 적용합니다. 이는 깊은 네트워크의 학습을 안정화하고 기울기 소실 문제를 완화하는 데 매우 중요합니다.</p>
+                            <p class="text-sm">각 하위 레이어(어텐션, 피드-포워드 네트워크)의 입력과 출력을 더하는 잔차 연결($x + Sublayer(x)$)과 계층 정규화를 적용합니다. 이는 깊은 네트워크의 학습을 안정화하고 기울기 소실 문제를 완화하는 데 매우 중요합니다.</p>
                         </li>
                     </ul>
                 </div>
@@ -318,7 +315,7 @@
                 <div class="p-4 bg-purple-50 rounded-lg shadow space-y-3">
                     <h3 class="text-xl font-semibold korean-title">최적화: Adam Optimizer & 학습률 스케줄</h3>
                     <p>Adam 옵티마이저 사용 ($\beta_1=0.9, \beta_2=0.98, \epsilon=10^{-9}$).</p>
-                    <p>학습률은 초기 <span class="highlight">웜업(warmup)</span> 단계 동안 선형적으로 증가시킨 후, 단계 수의 역제곱근에 비례하여 감소시키는 스케줄을 사용. (<span class="font-mono">warmup_steps = 4000</span>)</p>
+                    <p>학습률은 초기 <span class="highlight">웜업(warmup)</span> 단계 동안 선형적으로 증가시킨 후, 단계 수의 역제곱근에 비례하여 감소시키는 스케줄을 사용. ($warmup\_steps = 4000$)</p>
                     <div class="chart-container h-40 md:h-48 max-h-[200px] mt-2">
                         <canvas id="lrScheduleChart"></canvas>
                     </div>
@@ -329,11 +326,11 @@
                  <div class="grid md:grid-cols-2 gap-4">
                     <div>
                         <h4 class="text-lg font-semibold">잔차 드롭아웃 (Residual Dropout)</h4>
-                        <p class="text-sm">각 하위 레이어의 출력과 임베딩 합계에 드롭아웃 적용 (<span class="font-mono">P<sub>drop</sub>=0.1</span>). 과적합 방지.</p>
+                        <p class="text-sm">각 하위 레이어의 출력과 임베딩 합계에 드롭아웃 적용 ($P_{drop}=0.1$). 과적합 방지.</p>
                     </div>
                     <div>
                         <h4 class="text-lg font-semibold">레이블 스무딩 (Label Smoothing)</h4>
-                        <p class="text-sm">모델이 예측에 대해 지나치게 확신하는 것을 방지 (<span class="font-mono">&epsilon;<sub>ls</sub>=0.1</span>). 정확도 및 BLEU 점수 향상에 기여.</p>
+                        <p class="text-sm">모델이 예측에 대해 지나치게 확신하는 것을 방지 ($\epsilon_{ls}=0.1$). 정확도 및 BLEU 점수 향상에 기여.</p>
                     </div>
                  </div>
             </div>
@@ -372,6 +369,7 @@
     </footer>
 
     <script>
+        // Chart.js 차트의 x축 레이블이 길 경우 여러 줄로 래핑하는 함수
         function wrapLabels(labels, maxWidth) {
             return labels.map(label => {
                 if (typeof label === 'string' && label.length > maxWidth) {
@@ -393,6 +391,7 @@
             });
         }
 
+        // Chart.js 툴팁 콜백 함수 (래핑된 레이블 처리)
         const commonTooltipCallback = {
             plugins: {
                 tooltip: {
@@ -401,7 +400,7 @@
                             const item = tooltipItems[0];
                             let label = item.chart.data.labels[item.dataIndex];
                             if (Array.isArray(label)) {
-                              return label.join(' ');
+                              return label.join(' '); // 배열이면 공백으로 조인하여 표시
                             } else {
                               return label;
                             }
@@ -411,29 +410,31 @@
             }
         };
         
+        // 모든 차트에 공통적으로 적용될 옵션 설정 함수
         const commonChartOptions = (yLabel) => ({
-            responsive: true,
-            maintainAspectRatio: false,
+            responsive: true, // 반응형 활성화
+            maintainAspectRatio: false, // 가로세로 비율 유지 안 함
             scales: {
                 y: {
-                    beginAtZero: true,
-                    title: { display: true, text: yLabel, font: { size: 14, family: "'Nanum Gothic', sans-serif" } },
-                    ticks: { font: { family: "'Nanum Gothic', sans-serif" } }
+                    beginAtZero: true, // y축 0부터 시작
+                    title: { display: true, text: yLabel, font: { size: 14, family: "'Nanum Gothic', sans-serif" } }, // y축 제목
+                    ticks: { font: { family: "'Nanum Gothic', sans-serif" } } // y축 눈금 폰트
                 },
                 x: {
-                    ticks: { font: { family: "'Nanum Gothic', sans-serif" } }
+                    ticks: { font: { family: "'Nanum Gothic', sans-serif" } } // x축 눈금 폰트
                 }
             },
             plugins: {
-                ...commonTooltipCallback.plugins,
-                legend: { labels: { font: { size: 12, family: "'Nanum Gothic', sans-serif" } } }
+                ...commonTooltipCallback.plugins, // 공통 툴팁 콜백 포함
+                legend: { labels: { font: { size: 12, family: "'Nanum Gothic', sans-serif" } } } // 범례 폰트
             }
         });
 
+        // WMT 2014 영어-독일어 번역 성능 차트 생성
         const enDeCtx = document.getElementById('enDeBleuChart').getContext('2d');
         const enDeLabels = wrapLabels(['이전 SOTA (앙상블)', 'Transformer (Base)', 'Transformer (Big)'], 16);
         new Chart(enDeCtx, {
-            type: 'bar',
+            type: 'bar', // 막대 차트
             data: {
                 labels: enDeLabels,
                 datasets: [{
@@ -444,13 +445,14 @@
                     borderWidth: 1
                 }]
             },
-            options: commonChartOptions('BLEU 점수')
+            options: commonChartOptions('BLEU 점수') // 공통 옵션 적용
         });
 
+        // WMT 2014 영어-프랑스어 번역 성능 차트 생성
         const enFrCtx = document.getElementById('enFrBleuChart').getContext('2d');
         const enFrLabels = wrapLabels(['이전 SOTA (단일, 예: ConvS2S)', 'Transformer (Big)'], 16);
         new Chart(enFrCtx, {
-            type: 'bar',
+            type: 'bar', // 막대 차트
             data: {
                 labels: enFrLabels,
                 datasets: [{
@@ -461,12 +463,13 @@
                     borderWidth: 1
                 }]
             },
-            options: commonChartOptions('BLEU 점수')
+            options: commonChartOptions('BLEU 점수') // 공통 옵션 적용
         });
 
+        // 학습률 스케줄 차트 생성
         const lrCtx = document.getElementById('lrScheduleChart').getContext('2d');
         new Chart(lrCtx, {
-            type: 'line',
+            type: 'line', // 선 차트
             data: {
                 labels: ['0', 'Warmup End (4k)', '10k', '50k', '100k 단계'],
                 datasets: [{
@@ -474,8 +477,8 @@
                     data: [0.1, 1.0, 0.7, 0.3, 0.2],
                     borderColor: '#118AB2',
                     backgroundColor: 'rgba(17, 138, 178, 0.1)',
-                    tension: 0.1,
-                    fill: true
+                    tension: 0.1, // 선의 부드러움
+                    fill: true // 영역 채우기
                 }]
             },
             options: {
@@ -494,7 +497,7 @@
                 },
                 plugins: {
                     ...commonTooltipCallback.plugins,
-                    legend: { display: false }
+                    legend: { display: false } // 범례 숨김
                 }
             }
         });
