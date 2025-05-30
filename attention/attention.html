@@ -6,6 +6,8 @@
     <title>Transformer 모델 인포그래픽: Attention Is All You Need</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -46,36 +48,8 @@
             padding: 1.5rem;
             margin-bottom: 1.5rem;
         }
-        .math-formula {
-            font-family: 'Cambria Math', 'Latin Modern Math', 'STIX Two Math', serif;
-            font-size: 1.1em;
-            padding: 0.5em;
-            margin: 0.5em 0;
-            text-align: center;
-        }
-        .fraction {
-            display: inline-block;
-            position: relative;
-            vertical-align: middle;
-            letter-spacing: 0.05em;
-            text-align: center;
-        }
-        .fraction > .numerator {
-            display: block;
-            padding: 0 0.2em;
-        }
-        .fraction > .denominator {
-            display: block;
-            border-top: 1.5px solid currentColor;
-            padding: 0.2em 0.2em 0;
-        }
-        .sqrt-symbol {
-            font-size: 1.2em;
-            vertical-align: middle;
-        }
-        .overline {
-            text-decoration: overline;
-        }
+        /* MathJax가 수식을 렌더링하므로 기존 수식 관련 CSS는 제거합니다. */
+        /* .math-formula, .fraction, .numerator, .denominator, .sqrt-symbol, .overline { display: none; } */
         .flow-arrow {
             font-size: 1.5rem;
             color: var(--color-accent1);
@@ -91,12 +65,12 @@
           color: var(--color-accent1);
           font-weight: bold;
         }
-         .big-stat-number {
+          .big-stat-number {
             font-size: 3rem;
             font-weight: bold;
             color: var(--color-accent1);
             line-height: 1;
-        }
+          }
         .big-stat-label {
             font-size: 1rem;
             color: var(--color-heading);
@@ -163,10 +137,10 @@
                         <p class="mt-2">이는 당시 최고 성능 모델들의 훈련에 소요되던 시간에 비해 <span class="highlight">훨씬 짧은 시간</span>입니다. 병렬화 덕분에 가능한 성과입니다.</p>
                     </div>
                     <div class="flex justify-center items-center">
-                         <div class="text-center p-4">
-                            <div class="big-stat-number">~1/4</div>
-                            <div class="big-stat-label">이전 SOTA 모델 대비<br/>훈련 비용 (추정)</div>
-                        </div>
+                            <div class="text-center p-4">
+                                <div class="big-stat-number">~1/4</div>
+                                <div class="big-stat-label">이전 SOTA 모델 대비<br/>훈련 비용 (추정)</div>
+                            </div>
                     </div>
                 </div>
             </div>
@@ -198,8 +172,8 @@
                         <p class="mt-1 text-sm text-gray-600">의미 표현 기반으로 번역 생성</p>
                     </div>
                 </div>
-                 <p class="mt-4">인코더는 입력 시퀀스를 문맥 정보가 풍부한 연속적인 표현(벡터 시퀀스)으로 변환합니다. 디코더는 이 인코더의 출력을 참조하여 번역된 단어를 하나씩 생성합니다 (자기회귀 방식).</p>
-                 <p class="mt-4 text-center text-sm text-gray-600">Transformer 모델은 인코더-디코더 스택으로 구성됩니다. 인코더는 입력의 의미적 표현을 생성하고, 디코더는 이를 기반으로 번역을 생성합니다.</p>
+                   <p class="mt-4">인코더는 입력 시퀀스를 문맥 정보가 풍부한 연속적인 표현(벡터 시퀀스)으로 변환합니다. 디코더는 이 인코더의 출력을 참조하여 번역된 단어를 하나씩 생성합니다 (자기회귀 방식).</p>
+                   <p class="mt-4 text-center text-sm text-gray-600">Transformer 모델은 인코더-디코더 스택으로 구성됩니다. 인코더는 입력의 의미적 표현을 생성하고, 디코더는 이를 기반으로 번역을 생성합니다.</p>
             </div>
 
             <div class="mb-8 p-4 border rounded-lg bg-rose-50">
@@ -208,8 +182,8 @@
                 <div class="bg-white p-4 rounded-lg shadow mb-4">
                     <h4 class="text-xl font-semibold mb-2 korean-title">스케일드 닷-프로덕트 어텐션 (Scaled Dot-Product Attention)</h4>
                     <p>가장 기본적인 어텐션 메커니즘입니다. 쿼리(Query, Q), 키(Key, K), 값(Value, V)이라는 세 가지 벡터를 입력받아 다음과 같이 계산합니다:</p>
-                    <div class="math-formula bg-gray-100 rounded my-2">
-                        Attention(Q, K, V) = softmax($\frac{QK^T}{\sqrt{d_k}}$)V
+                    <div class="bg-gray-100 rounded my-2 p-2">
+                        $$Attention(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
                     </div>
                     <ul class="list-disc list-inside text-sm space-y-1">
                         <li>Q와 K의 유사도를 계산하고 ($QK^T$),</li>
@@ -228,10 +202,10 @@
                             <div>선형 변환 (각 헤드별)</div>
                         </div>
                         <div class="flow-arrow transform rotate-90 sm:rotate-0">➡️</div>
-                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center text-sm">
-                           <div>여러 어텐션 헤드 병렬 수행<br/>(Scaled Dot-Product Attention)</div>
-                           <div class="flow-arrow transform sm:rotate-0">⬇️</div>
-                           <div>결과들을 연결(Concatenate)</div>
+                           <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center text-sm">
+                            <div>여러 어텐션 헤드 병렬 수행<br/>(Scaled Dot-Product Attention)</div>
+                            <div class="flow-arrow transform sm:rotate-0">⬇️</div>
+                            <div>결과들을 연결(Concatenate)</div>
                         </div>
                         <div class="flow-arrow transform rotate-90 sm:rotate-0">➡️</div>
                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center text-sm">
@@ -242,7 +216,7 @@
                     </div>
                     <p>논문에서는 8개의 헤드를 사용했습니다. 이를 통해 모델은 "이 단어는 문법적으로 저 단어와 연결돼", "저 단어는 의미적으로 이 단어와 유사해" 와 같이 다양한 관계를 동시에 파악할 수 있게 됩니다.</p>
                 </div>
-                 <p class="mt-4">인코더에서는 셀프-어텐션(입력 문장 내 단어들 간의 관계)이, 디코더에서는 마스크된 셀프-어텐션(출력 문장 내 이미 생성된 단어들 간의 관계)과 인코더-디코더 어텐션(출력 단어가 입력 단어들에 주목)이 사용됩니다.</p>
+                   <p class="mt-4">인코더에서는 셀프-어텐션(입력 문장 내 단어들 간의 관계)이, 디코더에서는 마스크된 셀프-어텐션(출력 문장 내 이미 생성된 단어들 간의 관계)과 인코더-디코더 어텐션(출력 단어가 입력 단어들에 주목)이 사용됩니다.</p>
             </div>
 
             <div class="grid md:grid-cols-2 gap-6">
@@ -250,9 +224,9 @@
                     <h3 class="text-2xl font-semibold mb-3 korean-title">3.3. 순서 정보 주입: 위치 인코딩 (Positional Encoding)</h3>
                     <p class="mb-2">Transformer는 단어들을 동시에 처리하기 때문에 RNN처럼 자연스럽게 단어의 순서 정보를 알 수 없습니다. 따라서 <span class="highlight">위치 인코딩</span>이라는 특별한 벡터를 단어 임베딩에 더하여 각 단어의 위치 정보를 알려줍니다.</p>
                     <p class="mb-2">논문에서는 사인(sin) 및 코사인(cos) 함수를 사용하여 고정된 위치 인코딩 값을 생성합니다:</p>
-                    <div class="math-formula bg-gray-100 rounded text-sm">
-                        PE$_{(pos, 2i)}$ = sin(pos / 10000$^{2i/d_{model}}$)<br/>
-                        PE$_{(pos, 2i+1)}$ = cos(pos / 10000$^{2i/d_{model}}$)
+                    <div class="bg-gray-100 rounded text-sm my-2 p-2">
+                        $$PE_{(pos, 2i)} = \sin\left(\frac{pos}{10000^{2i/d_{model}}}\right)$$
+                        $$PE_{(pos, 2i+1)} = \cos\left(\frac{pos}{10000^{2i/d_{model}}}\right)$$
                     </div>
                     <p class="text-xs mt-1">(pos: 단어 위치, i: 인코딩 벡터 차원)</p>
                     <p class="mt-2">이 방식은 모델이 상대적인 위치 관계를 쉽게 학습하고, 훈련 데이터보다 긴 문장에도 일반화할 수 있도록 돕습니다.</p>
@@ -322,8 +296,8 @@
                 </div>
             </div>
             <div class="mt-6 p-4 bg-pink-50 rounded-lg shadow">
-                 <h3 class="text-xl font-semibold mb-3 korean-title">정규화 (Regularization)</h3>
-                 <div class="grid md:grid-cols-2 gap-4">
+                   <h3 class="text-xl font-semibold mb-3 korean-title">정규화 (Regularization)</h3>
+                   <div class="grid md:grid-cols-2 gap-4">
                     <div>
                         <h4 class="text-lg font-semibold">잔차 드롭아웃 (Residual Dropout)</h4>
                         <p class="text-sm">각 하위 레이어의 출력과 임베딩 합계에 드롭아웃 적용 ($P_{drop}=0.1$). 과적합 방지.</p>
@@ -332,7 +306,7 @@
                         <h4 class="text-lg font-semibold">레이블 스무딩 (Label Smoothing)</h4>
                         <p class="text-sm">모델이 예측에 대해 지나치게 확신하는 것을 방지 ($\epsilon_{ls}=0.1$). 정확도 및 BLEU 점수 향상에 기여.</p>
                     </div>
-                 </div>
+                   </div>
             </div>
         </section>
 
@@ -400,9 +374,9 @@
                             const item = tooltipItems[0];
                             let label = item.chart.data.labels[item.dataIndex];
                             if (Array.isArray(label)) {
-                              return label.join(' '); // 배열이면 공백으로 조인하여 표시
+                                return label.join(' '); // 배열이면 공백으로 조인하여 표시
                             } else {
-                              return label;
+                                return label;
                             }
                         }
                     }
