@@ -186,8 +186,8 @@
                         $$Attention(Q, K, V) = \text{softmax}\left(\frac{QK^T}{\sqrt{d_k}}\right)V$$
                     </div>
                     <ul class="list-disc list-inside text-sm space-y-1">
-                        <li>Q와 K의 유사도를 계산하고 ($QK^T$),</li>
-                        <li>$\sqrt{d_k}$로 나누어 스케일링한 후 (기울기 소실 방지),</li>
+                        <li>Q와 K의 유사도를 계산하고 (QK^T),</li>
+                        <li>sqrt{d_k}로 나누어 스케일링한 후 (기울기 소실 방지),</li>
                         <li>softmax 함수를 통해 가중치를 얻고,</li>
                         <li>이 가중치를 V에 곱하여 최종 어텐션 값을 얻습니다.</li>
                     </ul>
