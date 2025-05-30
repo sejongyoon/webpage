@@ -1,0 +1,503 @@
+﻿<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Transformer 모델 인포그래픽: Attention Is All You Need</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        :root {
+            --color-text: #073B4C;
+            --color-heading: #118AB2;
+            --color-accent1: #FF6B6B;
+            --color-accent2: #FFD166;
+            --color-accent3: #06D6A0;
+            --color-card-bg: #FFFFFF;
+            --color-page-bg: #F8F9FA;
+        }
+        body {
+            background-color: var(--color-page-bg);
+            color: var(--color-text);
+        }
+        h1, h2, h3 {
+            color: var(--color-heading);
+        }
+        .accent-text1 { color: var(--color-accent1); }
+        .accent-text2 { color: var(--color-accent2); }
+        .accent-text3 { color: var(--color-accent3); }
+        .bg-accent1 { background-color: var(--color-accent1); }
+        .bg-accent2 { background-color: var(--color-accent2); }
+        .bg-accent3 { background-color: var(--color-accent3); }
+
+        .chart-container {
+            position: relative;
+            width: 100%;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .material-card {
+            background-color: var(--color-card-bg);
+            border-radius: 0.5rem;
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            padding: 1.5rem;
+            margin-bottom: 1.5rem;
+        }
+        .math-formula {
+            font-family: 'Cambria Math', 'Latin Modern Math', 'STIX Two Math', serif;
+            font-size: 1.1em;
+            padding: 0.5em;
+            margin: 0.5em 0;
+            text-align: center;
+        }
+        .fraction {
+            display: inline-block;
+            position: relative;
+            vertical-align: middle;
+            letter-spacing: 0.05em;
+            text-align: center;
+        }
+        .fraction > .numerator {
+            display: block;
+            padding: 0 0.2em;
+        }
+        .fraction > .denominator {
+            display: block;
+            border-top: 1.5px solid currentColor;
+            padding: 0.2em 0.2em 0;
+        }
+        .sqrt-symbol {
+            font-size: 1.2em;
+            vertical-align: middle;
+        }
+        .overline {
+            text-decoration: overline;
+        }
+        .flow-arrow {
+            font-size: 1.5rem;
+            color: var(--color-accent1);
+        }
+        .korean-title {
+          font-family: 'Nanum Gothic', 'Malgun Gothic', sans-serif;
+        }
+        .korean-text {
+          font-family: 'Nanum Gothic', 'Malgun Gothic', sans-serif;
+          line-height: 1.8;
+        }
+        .highlight {
+          color: var(--color-accent1);
+          font-weight: bold;
+        }
+         .big-stat-number {
+            font-size: 3rem;
+            font-weight: bold;
+            color: var(--color-accent1);
+            line-height: 1;
+        }
+        .big-stat-label {
+            font-size: 1rem;
+            color: var(--color-heading);
+            margin-top: 0.5rem;
+        }
+    </style>
+</head>
+<body class="antialiased">
+    <header class="bg-accent1 text-white p-8 text-center korean-title">
+        <h1 class="text-4xl font-bold">Attention Is All You Need</h1>
+        <p class="text-xl mt-2">Transformer 모델 완전 정복: 어텐션 메커니즘의 혁명</p>
+    </header>
+
+    <main class="container mx-auto p-4 md:p-8 korean-text">
+        
+        <section id="intro" class="material-card">
+            <h2 class="text-3xl font-bold mb-4 korean-title">1. 서론: 기계 번역의 새로운 지평을 열다</h2>
+            <p class="mb-4">기존의 기계 번역 모델들은 주로 순환 신경망(RNN)이나 합성곱 신경망(CNN)에 기반했습니다. 이 모델들은 문장의 단어들을 순차적으로 처리하거나, 지역적인 정보에 집중하는 방식으로 작동했습니다. 하지만 이는 몇 가지 한계를 드러냈습니다:</p>
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div class="border border-gray-300 p-4 rounded-lg">
+                    <h3 class="text-xl font-semibold mb-2 korean-title">RNN/CNN의 한계</h3>
+                    <ul class="list-disc list-inside space-y-1">
+                        <li><span class="font-semibold">순차적 처리의 병목:</span> RNN은 단어를 하나씩 처리해야 하므로, 문장이 길어질수록 계산 시간이 오래 걸리고 병렬 처리가 어렵습니다. 이는 GPU의 성능을 최대한 활용하지 못하게 합니다.</li>
+                        <li><span class="font-semibold">장거리 의존성 학습의 어려움:</span> 문장 내에서 멀리 떨어진 단어들 간의 관계를 파악하기 어렵습니다. 예를 들어, "나는 어제 <span class="highlight">파리</span>에서 재미있는 영화를 보고 오늘 <span class="highlight">그곳</span>에 다시 가고 싶어졌다"에서 '그곳'이 '파리'를 지칭한다는 것을 학습하기 어렵습니다.</li>
+                        <li><span class="font-semibold">CNN의 제한된 시야:</span> CNN은 주변 단어들의 정보는 잘 포착하지만, 문장 전체의 광범위한 문맥을 파악하는 데는 한계가 있습니다.</li>
+                    </ul>
+                </div>
+                <div class="border border-gray-300 p-4 rounded-lg flex flex-col items-center justify-center">
+                    <h3 class="text-xl font-semibold mb-2 korean-title">Transformer의 혁신적 아이디어</h3>
+                    <p class="text-center mb-2">"Attention Is All You Need" 논문은 이러한 한계를 극복하기 위해 <span class="highlight">Transformer</span>라는 혁신적인 아키텍처를 제안합니다.</p>
+                    <p class="text-2xl font-bold text-center accent-text1 p-4 bg-blue-50 rounded-lg">"어텐션(Attention)만으로 모든 것을 해결한다!"</p>
+                    <p class="mt-2 text-center">Transformer는 RNN이나 CNN 구조를 완전히 버리고, 오직 '어텐션'이라는 메커니즘에만 의존하여 입력 문장과 출력 문장 간의 관계를 파악합니다. 이를 통해 병렬 처리가 가능해지고 장거리 의존성 문제도 효과적으로 해결합니다.</p>
+                </div>
+            </div>
+            <p>이 인포그래픽을 통해 Transformer가 어떻게 기존 모델의 한계를 뛰어넘어 기계 번역 분야의 새로운 표준이 되었는지, 그 핵심 원리와 놀라운 성능을 자세히 살펴보겠습니다.</p>
+        </section>
+
+        <section id="performance" class="material-card">
+            <h2 class="text-3xl font-bold mb-4 korean-title">2. 압도적인 성능: Transformer의 등장</h2>
+            <p class="mb-6">Transformer는 기존의 최첨단 모델들을 능가하는 번역 품질(BLEU 점수)을 달성했을 뿐만 아니라, 훈련 시간 또한 획기적으로 단축시켰습니다. 이는 병렬 처리에 최적화된 어텐션 메커니즘 덕분입니다.</p>
+            
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="text-xl font-semibold mb-3 text-center korean-title">WMT 2014 영어 → 독일어 번역 성능 (BLEU 점수)</h3>
+                    <div class="chart-container h-72 md:h-80 max-h-[400px]">
+                        <canvas id="enDeBleuChart"></canvas>
+                    </div>
+                    <p class="mt-4 text-sm text-gray-600 text-center">Transformer (Big) 모델은 이전 최고 성능(앙상블 포함)을 2.0 BLEU 포인트 이상 뛰어넘는 28.4점을 기록했습니다. 기본 모델(Base)조차 기존 모델들을 압도했습니다.</p>
+                </div>
+                <div>
+                    <h3 class="text-xl font-semibold mb-3 text-center korean-title">WMT 2014 영어 → 프랑스어 번역 성능 (BLEU 점수)</h3>
+                    <div class="chart-container h-72 md:h-80 max-h-[400px]">
+                        <canvas id="enFrBleuChart"></canvas>
+                    </div>
+                    <p class="mt-4 text-sm text-gray-600 text-center">Transformer (Big) 모델은 41.8 BLEU 점수로 새로운 단일 모델 최고 기록을 세웠습니다. 이는 이전 모델들의 훈련 비용의 극히 일부만으로 달성한 성과입니다.</p>
+                </div>
+            </div>
+
+            <div class="text-center material-card bg-blue-50 p-6">
+                <h3 class="text-2xl font-bold mb-3 korean-title accent-text1">획기적인 훈련 효율성</h3>
+                <div class="grid md:grid-cols-2 gap-4 items-center">
+                    <div>
+                        <p class="text-lg">Transformer (Big) 모델은 WMT 2014 영어-프랑스어 태스크에서 단 <span class="font-bold accent-text1 text-2xl">3.5일</span> 만에 훈련을 완료했습니다 (8개 P100 GPU 사용 기준).</p>
+                        <p class="mt-2">이는 당시 최고 성능 모델들의 훈련에 소요되던 시간에 비해 <span class="highlight">훨씬 짧은 시간</span>입니다. 병렬화 덕분에 가능한 성과입니다.</p>
+                    </div>
+                    <div class="flex justify-center items-center">
+                         <div class="text-center p-4">
+                            <div class="big-stat-number">~1/4</div>
+                            <div class="big-stat-label">이전 SOTA 모델 대비<br/>훈련 비용 (추정)</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="architecture" class="material-card">
+            <h2 class="text-3xl font-bold mb-6 korean-title">3. Transformer 아키텍처 심층 분석</h2>
+            <p class="mb-6">Transformer는 복잡한 RNN이나 CNN 없이, 오직 어텐션 메커니즘을 기반으로 하는 인코더-디코더 구조를 따릅니다. 각 구성 요소가 어떻게 상호작용하여 뛰어난 성능을 내는지 살펴봅시다.</p>
+
+            <div class="mb-8 p-4 border rounded-lg bg-sky-50">
+                <h3 class="text-2xl font-semibold mb-3 text-center korean-title">3.1. 전체 구조: 인코더-디코더 스택</h3>
+                <p class="mb-4">Transformer는 입력 문장을 처리하는 <span class="font-semibold text-blue-600">인코더(Encoder)</span> 스택과, 이를 바탕으로 출력 문장을 생성하는 <span class="font-semibold text-green-600">디코더(Decoder)</span> 스택으로 구성됩니다. 논문에서는 각각 6개의 동일한 레이어를 쌓았습니다.</p>
+                <div class="flex flex-col md:flex-row justify-around items-center p-4 bg-white rounded-lg shadow">
+                    <div class="text-center mb-4 md:mb-0">
+                        <div class="p-4 border-2 border-blue-500 rounded-lg w-48 h-32 flex flex-col justify-center items-center">
+                            <span class="text-lg font-bold text-blue-700">입력 문장</span>
+                            <span class="text-2xl my-1">➡️</span>
+                            <span class="text-lg font-bold text-blue-700">인코더 스택 (N=6)</span>
+                        </div>
+                        <p class="mt-1 text-sm text-gray-600">입력의 의미적 표현 생성</p>
+                    </div>
+                    <div class="text-2xl font-bold text-gray-500 mx-4 hidden md:block">🔗</div>
+                     <div class="text-center">
+                        <div class="p-4 border-2 border-green-500 rounded-lg w-48 h-32 flex flex-col justify-center items-center">
+                            <span class="text-lg font-bold text-green-700">디코더 스택 (N=6)</span>
+                             <span class="text-2xl my-1">➡️</span>
+                            <span class="text-lg font-bold text-green-700">출력 문장</span>
+                        </div>
+                        <p class="mt-1 text-sm text-gray-600">의미 표현 기반으로 번역 생성</p>
+                    </div>
+                </div>
+                 <p class="mt-4">인코더는 입력 시퀀스를 문맥 정보가 풍부한 연속적인 표현(벡터 시퀀스)으로 변환합니다. 디코더는 이 인코더의 출력을 참조하여 번역된 단어를 하나씩 생성합니다 (자기회귀 방식).</p>
+                 <div class="flex justify-center mt-8">
+                    <img src="transformer.png" alt="Transformer 모델 아키텍처 다이어그램" class="max-w-full h-auto rounded-lg shadow-lg">
+                 </div>
+                 <p class="mt-4 text-center text-sm text-gray-600">위 그림은 Transformer 모델의 전체 아키텍처를 보여줍니다. 왼쪽은 인코더, 오른쪽은 디코더 스택입니다.</p>
+            </div>
+
+            <div class="mb-8 p-4 border rounded-lg bg-rose-50">
+                <h3 class="text-2xl font-semibold mb-3 text-center korean-title">3.2. 핵심 엔진: 멀티-헤드 어텐션 (Multi-Head Attention)</h3>
+                <p class="mb-4">Transformer의 심장은 <span class="highlight">멀티-헤드 어텐션</span>입니다. 이는 문장 내 단어들 간의 관계, 즉 어떤 단어가 다른 단어에 얼마나 '주의(attention)'를 기울여야 하는지를 계산합니다.</p>
+                <div class="bg-white p-4 rounded-lg shadow mb-4">
+                    <h4 class="text-xl font-semibold mb-2 korean-title">스케일드 닷-프로덕트 어텐션 (Scaled Dot-Product Attention)</h4>
+                    <p>가장 기본적인 어텐션 메커니즘입니다. 쿼리(Query, Q), 키(Key, K), 값(Value, V)이라는 세 가지 벡터를 입력받아 다음과 같이 계산합니다:</p>
+                    <div class="math-formula bg-gray-100 rounded my-2">
+                        Attention(Q, K, V) = softmax(<span class="fraction"><span class="numerator">QK<sup>T</sup></span><span class="denominator"><span class="sqrt-symbol">&radic;</span><span class="overline">d<sub>k</sub></span></span></span>)V
+                    </div>
+                    <ul class="list-disc list-inside text-sm space-y-1">
+                        <li>Q와 K의 유사도를 계산하고 (<span class="font-mono">QK<sup>T</sup></span>),</li>
+                        <li><span class="font-mono">&radic;d<sub>k</sub></span>로 나누어 스케일링한 후 (기울기 소실 방지),</li>
+                        <li>softmax 함수를 통해 가중치를 얻고,</li>
+                        <li>이 가중치를 V에 곱하여 최종 어텐션 값을 얻습니다.</li>
+                    </ul>
+                </div>
+                <div class="bg-white p-4 rounded-lg shadow">
+                    <h4 class="text-xl font-semibold mb-2 korean-title">멀티-헤드 방식</h4>
+                    <p>단일 어텐션 대신, 여러 개의 어텐션 '헤드'를 병렬로 사용합니다. 각 헤드는 서로 다른 관점에서 정보의 연관성을 학습합니다.</p>
+                    <div class="my-4 p-2 border rounded-md bg-gray-50 text-center">
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center text-sm">
+                            <div>Q, K, V 입력</div>
+                            <div class="flow-arrow transform sm:rotate-0">⬇️</div>
+                            <div>선형 변환 (각 헤드별)</div>
+                        </div>
+                        <div class="flow-arrow transform rotate-90 sm:rotate-0">➡️</div>
+                         <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center text-sm">
+                           <div>여러 어텐션 헤드 병렬 수행<br/>(Scaled Dot-Product Attention)</div>
+                           <div class="flow-arrow transform sm:rotate-0">⬇️</div>
+                           <div>결과들을 연결(Concatenate)</div>
+                        </div>
+                        <div class="flow-arrow transform rotate-90 sm:rotate-0">➡️</div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 items-center text-sm">
+                            <div>최종 선형 변환</div>
+                            <div class="flow-arrow transform sm:rotate-0">⬇️</div>
+                            <div>멀티-헤드 어텐션 출력</div>
+                        </div>
+                    </div>
+                    <p>논문에서는 8개의 헤드를 사용했습니다. 이를 통해 모델은 "이 단어는 문법적으로 저 단어와 연결돼", "저 단어는 의미적으로 이 단어와 유사해" 와 같이 다양한 관계를 동시에 파악할 수 있게 됩니다.</p>
+                </div>
+                 <p class="mt-4">인코더에서는 셀프-어텐션(입력 문장 내 단어들 간의 관계)이, 디코더에서는 마스크된 셀프-어텐션(출력 문장 내 이미 생성된 단어들 간의 관계)과 인코더-디코더 어텐션(출력 단어가 입력 단어들에 주목)이 사용됩니다.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="p-4 border rounded-lg bg-teal-50">
+                    <h3 class="text-2xl font-semibold mb-3 korean-title">3.3. 순서 정보 주입: 위치 인코딩 (Positional Encoding)</h3>
+                    <p class="mb-2">Transformer는 단어들을 동시에 처리하기 때문에 RNN처럼 자연스럽게 단어의 순서 정보를 알 수 없습니다. 따라서 <span class="highlight">위치 인코딩</span>이라는 특별한 벡터를 단어 임베딩에 더하여 각 단어의 위치 정보를 알려줍니다.</p>
+                    <p class="mb-2">논문에서는 사인(sin) 및 코사인(cos) 함수를 사용하여 고정된 위치 인코딩 값을 생성합니다:</p>
+                    <div class="math-formula bg-gray-100 rounded text-sm">
+                        PE<sub>(pos, 2i)</sub> = sin(pos / 10000<sup>2i/d<sub>model</sub></sup>)<br/>
+                        PE<sub>(pos, 2i+1)</sub> = cos(pos / 10000<sup>2i/d<sub>model</sub></sup>)
+                    </div>
+                    <p class="text-xs mt-1">(pos: 단어 위치, i: 인코딩 벡터 차원)</p>
+                    <p class="mt-2">이 방식은 모델이 상대적인 위치 관계를 쉽게 학습하고, 훈련 데이터보다 긴 문장에도 일반화할 수 있도록 돕습니다.</p>
+                </div>
+
+                <div class="p-4 border rounded-lg bg-indigo-50">
+                    <h3 class="text-2xl font-semibold mb-3 korean-title">3.4. 추가 핵심 요소들</h3>
+                    <ul class="space-y-3">
+                        <li>
+                            <h4 class="text-lg font-semibold">Position-wise Feed-Forward Networks</h4>
+                            <p class="text-sm">각 어텐션 레이어 다음에는 간단한 완전 연결 피드-포워드 네트워크가 위치별로(각 단어에 대해 독립적으로) 적용됩니다. 이는 어텐션을 통해 얻은 정보를 추가적으로 처리하고 변환하는 역할을 합니다. (ReLU 활성화 함수 포함)</p>
+                        </li>
+                        <li>
+                            <h4 class="text-lg font-semibold">잔차 연결 (Residual Connections) & 계층 정규화 (Layer Normalization)</h4>
+                            <p class="text-sm">각 하위 레이어(어텐션, 피드-포워드 네트워크)의 입력과 출력을 더하는 잔차 연결(<span class="font-mono">x + Sublayer(x)</span>)과 계층 정규화를 적용합니다. 이는 깊은 네트워크의 학습을 안정화하고 기울기 소실 문제를 완화하는 데 매우 중요합니다.</p>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <section id="advantages" class="material-card">
+            <h2 class="text-3xl font-bold mb-6 korean-title">4. 왜 Transformer인가? - 주요 장점</h2>
+            <p class="mb-6">Transformer는 단순한 성능 향상을 넘어, 모델 아키텍처에 대한 근본적인 변화를 가져왔습니다. 주요 장점은 다음과 같습니다.</p>
+            <div class="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div class="p-4 bg-green-50 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-2 korean-title accent-text3">🚀 압도적인 병렬화</h3>
+                    <p>단어들을 순차적으로 처리할 필요 없이 한 번에 계산할 수 있어 GPU 활용을 극대화합니다. 이는 <span class="highlight">훈련 시간을 획기적으로 단축</span>시킵니다.</p>
+                    <div class="mt-2 text-center text-4xl">⚡️</div>
+                </div>
+                <div class="p-4 bg-yellow-50 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-2 korean-title accent-text2">🔗 장거리 의존성 학습 용이</h3>
+                    <p>어텐션은 문장 내 아무리 멀리 떨어진 단어 쌍이라도 직접 연결하여 관계를 학습할 수 있습니다. 경로 길이가 <span class="highlight">O(1)</span>로 일정합니다 (RNN은 O(n)).</p>
+                     <div class="mt-2 text-center text-2xl">🌍</div>
+                </div>
+                <div class="p-4 bg-red-50 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-2 korean-title accent-text1">⏱️ 더 빠른 훈련</h3>
+                    <p>병렬 처리 능력과 효율적인 구조 덕분에, 기존 최고 모델들보다 <span class="highlight">훨씬 적은 시간과 비용</span>으로 최첨단 성능을 달성합니다.</p>
+                     <div class="mt-2 text-center text-3xl">💰</div>
+                </div>
+                <div class="p-4 bg-blue-50 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-2 korean-title">💡 향상된 해석 가능성</h3>
+                    <p>어텐션 가중치를 시각화하면 모델이 번역 과정에서 어떤 단어에 집중하는지 파악할 수 있습니다. 이는 모델의 <span class="highlight">작동 방식을 이해</span>하는 데 도움을 줍니다.</p>
+                     <div class="mt-2 text-center text-3xl">🔍</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="training" class="material-card">
+            <h2 class="text-3xl font-bold mb-6 korean-title">5. 모델 훈련의 비밀</h2>
+            <p class="mb-6">Transformer의 뛰어난 성능 뒤에는 신중하게 설계된 훈련 과정이 있습니다. 주요 훈련 기법들을 소개합니다.</p>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="p-4 bg-indigo-50 rounded-lg shadow space-y-3">
+                    <h3 class="text-xl font-semibold korean-title">데이터셋 및 배치 처리</h3>
+                    <p>WMT 2014 영어-독일어 (약 450만 문장 쌍), 영어-프랑스어 (약 3600만 문장 쌍) 데이터셋 사용. 바이트-쌍 인코딩(BPE) 또는 워드-피스(WordPiece)로 어휘 분할. 각 배치는 약 25,000개의 소스/타겟 토큰을 포함하도록 구성.</p>
+                    
+                    <h3 class="text-xl font-semibold korean-title">하드웨어</h3>
+                    <p>8개의 NVIDIA P100 GPU가 장착된 단일 머신에서 훈련.</p>
+                </div>
+                <div class="p-4 bg-purple-50 rounded-lg shadow space-y-3">
+                    <h3 class="text-xl font-semibold korean-title">최적화: Adam Optimizer & 학습률 스케줄</h3>
+                    <p>Adam 옵티마이저 사용 ($\beta_1=0.9, \beta_2=0.98, \epsilon=10^{-9}$).</p>
+                    <p>학습률은 초기 <span class="highlight">웜업(warmup)</span> 단계 동안 선형적으로 증가시킨 후, 단계 수의 역제곱근에 비례하여 감소시키는 스케줄을 사용. (<span class="font-mono">warmup_steps = 4000</span>)</p>
+                    <div class="chart-container h-40 md:h-48 max-h-[200px] mt-2">
+                        <canvas id="lrScheduleChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-6 p-4 bg-pink-50 rounded-lg shadow">
+                 <h3 class="text-xl font-semibold mb-3 korean-title">정규화 (Regularization)</h3>
+                 <div class="grid md:grid-cols-2 gap-4">
+                    <div>
+                        <h4 class="text-lg font-semibold">잔차 드롭아웃 (Residual Dropout)</h4>
+                        <p class="text-sm">각 하위 레이어의 출력과 임베딩 합계에 드롭아웃 적용 (<span class="font-mono">P<sub>drop</sub>=0.1</span>). 과적합 방지.</p>
+                    </div>
+                    <div>
+                        <h4 class="text-lg font-semibold">레이블 스무딩 (Label Smoothing)</h4>
+                        <p class="text-sm">모델이 예측에 대해 지나치게 확신하는 것을 방지 (<span class="font-mono">&epsilon;<sub>ls</sub>=0.1</span>). 정확도 및 BLEU 점수 향상에 기여.</p>
+                    </div>
+                 </div>
+            </div>
+        </section>
+
+        <section id="conclusion" class="material-card">
+            <h2 class="text-3xl font-bold mb-6 korean-title">6. 결론 및 미래: 어텐션의 무한한 가능성</h2>
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="p-4 bg-lime-50 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-3 korean-title accent-text3">Transformer의 핵심 기여</h3>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li>오직 <span class="highlight">어텐션에만 기반</span>한 최초의 성공적인 시퀀스 변환 모델.</li>
+                        <li>기계 번역에서 <span class="highlight">새로운 SOTA(최첨단) 달성</span> (더 높은 BLEU 점수).</li>
+                        <li>병렬화를 통해 <span class="highlight">훈련 시간 및 비용 대폭 절감</span>.</li>
+                        <li>자연어 처리(NLP) 분야의 <span class="highlight">패러다임 전환</span>을 이끌며 BERT, GPT 등 후속 모델들의 기반 마련.</li>
+                    </ul>
+                </div>
+                 <div class="p-4 bg-cyan-50 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold mb-3 korean-title">향후 연구 방향</h3>
+                    <p class="mb-2">논문 저자들은 Transformer의 아이디어를 다음과 같이 확장할 계획을 밝혔습니다:</p>
+                    <ul class="list-disc list-inside space-y-2">
+                        <li><span class="font-semibold">다양한 분야로의 확장:</span> 텍스트뿐만 아니라 <span class="highlight">이미지 🖼️, 오디오 🎧, 비디오 🎬</span> 등 다른 유형의 데이터를 처리하는 문제에 적용. (실제로 Vision Transformer (ViT) 등으로 현실화됨)</li>
+                        <li><span class="font-semibold">제한된 어텐션 메커니즘:</span> 매우 긴 시퀀스나 고해상도 데이터를 효율적으로 처리하기 위해 어텐션 범위를 제한하는 방식 연구.</li>
+                        <li><span class="font-semibold">비순차적 생성:</span> 현재의 자기회귀적(단어 하나씩 순차 생성) 방식을 개선하여 더욱 효율적인 생성 방법 모색.</li>
+                    </ul>
+                </div>
+            </div>
+            <p class="mt-8 text-center text-lg">Transformer는 단순한 모델 개선을 넘어, 인공지능 연구의 새로운 가능성을 열었습니다. "Attention Is All You Need"라는 제목처럼, 어텐션 메커니즘은 다양한 분야에서 핵심적인 역할을 수행하며 AI 기술 발전을 이끌고 있습니다.</p>
+        </section>
+
+    </main>
+
+    <footer class="text-center p-6 bg-gray-800 text-gray-300 text-sm">
+        <p>&copy; 2024 Transformer 인포그래픽. "Attention Is All You Need" (Vaswani et al., 2017) 논문 기반.</p>
+        <p>이 자료는 교육적 목적으로 제작되었습니다.</p>
+    </footer>
+
+    <script>
+        function wrapLabels(labels, maxWidth) {
+            return labels.map(label => {
+                if (typeof label === 'string' && label.length > maxWidth) {
+                    const words = label.split(' ');
+                    const lines = [];
+                    let currentLine = '';
+                    for (const word of words) {
+                        if ((currentLine + word).length > maxWidth && currentLine.length > 0) {
+                            lines.push(currentLine.trim());
+                            currentLine = word + ' ';
+                        } else {
+                            currentLine += word + ' ';
+                        }
+                    }
+                    lines.push(currentLine.trim());
+                    return lines;
+                }
+                return label;
+            });
+        }
+
+        const commonTooltipCallback = {
+            plugins: {
+                tooltip: {
+                    callbacks: {
+                        title: function(tooltipItems) {
+                            const item = tooltipItems[0];
+                            let label = item.chart.data.labels[item.dataIndex];
+                            if (Array.isArray(label)) {
+                              return label.join(' ');
+                            } else {
+                              return label;
+                            }
+                        }
+                    }
+                }
+            }
+        };
+        
+        const commonChartOptions = (yLabel) => ({
+            responsive: true,
+            maintainAspectRatio: false,
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    title: { display: true, text: yLabel, font: { size: 14, family: "'Nanum Gothic', sans-serif" } },
+                    ticks: { font: { family: "'Nanum Gothic', sans-serif" } }
+                },
+                x: {
+                    ticks: { font: { family: "'Nanum Gothic', sans-serif" } }
+                }
+            },
+            plugins: {
+                ...commonTooltipCallback.plugins,
+                legend: { labels: { font: { size: 12, family: "'Nanum Gothic', sans-serif" } } }
+            }
+        });
+
+        const enDeCtx = document.getElementById('enDeBleuChart').getContext('2d');
+        const enDeLabels = wrapLabels(['이전 SOTA (앙상블)', 'Transformer (Base)', 'Transformer (Big)'], 16);
+        new Chart(enDeCtx, {
+            type: 'bar',
+            data: {
+                labels: enDeLabels,
+                datasets: [{
+                    label: 'BLEU 점수',
+                    data: [26.4, 27.3, 28.4],
+                    backgroundColor: ['#FFD166', '#06D6A0', '#118AB2'],
+                    borderColor: ['#FFB300', '#00BFA5', '#0E7490'],
+                    borderWidth: 1
+                }]
+            },
+            options: commonChartOptions('BLEU 점수')
+        });
+
+        const enFrCtx = document.getElementById('enFrBleuChart').getContext('2d');
+        const enFrLabels = wrapLabels(['이전 SOTA (단일, 예: ConvS2S)', 'Transformer (Big)'], 16);
+        new Chart(enFrCtx, {
+            type: 'bar',
+            data: {
+                labels: enFrLabels,
+                datasets: [{
+                    label: 'BLEU 점수',
+                    data: [40.46, 41.8],
+                    backgroundColor: ['#FFD166', '#FF6B6B'],
+                    borderColor: ['#FFB300', '#D32F2F'],
+                    borderWidth: 1
+                }]
+            },
+            options: commonChartOptions('BLEU 점수')
+        });
+
+        const lrCtx = document.getElementById('lrScheduleChart').getContext('2d');
+        new Chart(lrCtx, {
+            type: 'line',
+            data: {
+                labels: ['0', 'Warmup End (4k)', '10k', '50k', '100k 단계'],
+                datasets: [{
+                    label: '학습률 (Learning Rate)',
+                    data: [0.1, 1.0, 0.7, 0.3, 0.2],
+                    borderColor: '#118AB2',
+                    backgroundColor: 'rgba(17, 138, 178, 0.1)',
+                    tension: 0.1,
+                    fill: true
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: { 
+                        beginAtZero: true, 
+                        title: { display: true, text: '상대적 학습률', font: { size: 10, family: "'Nanum Gothic', sans-serif"} },
+                        ticks: { font: { size: 9, family: "'Nanum Gothic', sans-serif"} }
+                    },
+                    x: { 
+                        title: { display: true, text: '훈련 단계', font: { size: 10, family: "'Nanum Gothic', sans-serif"} },
+                        ticks: { font: { size: 9, family: "'Nanum Gothic', sans-serif"} }
+                    }
+                },
+                plugins: {
+                    ...commonTooltipCallback.plugins,
+                    legend: { display: false }
+                }
+            }
+        });
+    </script>
+</body>
+</html>
