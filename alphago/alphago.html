@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AlphaGo: 대화형 기술 분석</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Calm Harmony (Stone, Blue, Gray) -->
+    <!-- Application Structure Plan: Thematic sections (Intro, Core Engine, Performance, Interactive Demo, Conclusion) to guide the user from high-level concepts to a concrete, interactive example. The "Core Engine" uses interactive diagrams for the training pipeline and MCTS loop. The "Interactive Demo" visualizes a single move decision using heatmaps on a Go board. This structure prioritizes guided learning and engagement over a linear report summary. -->
+    <!-- Visualization & Content Choices: [Training Pipeline (Fig 1) -> Goal: Explain learning -> Viz: Interactive HTML/CSS flowchart -> Interaction: Click to show details -> Justification: Breaks down complex process -> Method: HTML/JS], [MCTS (Fig 3) -> Goal: Explain thinking -> Viz: Interactive HTML/CSS flowchart -> Interaction: Click to show details -> Justification: Clarifies algorithm loop -> Method: HTML/JS], [Performance (Fig 4) -> Goal: Compare strength -> Viz: Bar Chart -> Interaction: Hover tooltips -> Justification: Clear data comparison -> Library: Chart.js], [In-game View (Fig 5) -> Goal: Show components in action -> Viz: Interactive Go board with heatmaps -> Interaction: Toggle views (Value, Policy, Search) -> Justification: Makes abstract concepts tangible -> Method: HTML/JS Grid]. -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 400px; max-height: 50vh; }
+        .diagram-box { transition: all 0.3s ease-in-out; }
+        .diagram-box.active {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.3), 0 4px 6px -2px rgba(59, 130, 246, 0.2);
+            border-color: #3B82F6;
+        }
+        .go-board { display: grid; grid-template-columns: repeat(19, 1fr); grid-template-rows: repeat(19, 1fr); border: 2px solid #78716c; background-color: #f5deb3; aspect-ratio: 1 / 1; }
+        .go-intersection { position: relative; }
+        .go-intersection::before, .go-intersection::after { content: ''; position: absolute; background-color: #78716c; }
+        .go-intersection::before { width: 100%; height: 1px; top: 50%; left: 0; transform: translateY(-50%); }
+        .go-intersection::after { width: 1px; height: 100%; left: 50%; top: 0; transform: translateX(-50%); }
+        .go-stone { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 90%; height: 90%; border-radius: 50%; z-index: 10; box-shadow: 1px 1px 2px rgba(0,0,0,0.4); }
+        .go-marker { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 50%; height: 50%; z-index: 15; }
+        .go-heatmap { position: absolute; top: 0; left: 0; width: 100%; height: 100%; z-index: 5; transition: background-color 0.3s; }
+    </style>
+</head>
+<body class="bg-stone-50 text-stone-800">
+
+    <nav class="bg-white/70 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center">
+                    <span class="font-bold text-xl text-blue-600">AlphaGo</span>
+                </div>
+                <div class="hidden md:block">
+                    <div class="ml-10 flex items-baseline space-x-4">
+                        <a href="#introduction" class="text-stone-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">소개</a>
+                        <a href="#learning" class="text-stone-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">학습 원리</a>
+                        <a href="#thinking" class="text-stone-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">탐색 원리</a>
+                        <a href="#performance" class="text-stone-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">성능</a>
+                        <a href="#interactive-demo" class="text-stone-600 hover:bg-blue-500 hover:text-white px-3 py-2 rounded-md text-sm font-medium">탐색 시각화</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="introduction" class="py-20 sm:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+                <h1 class="text-4xl md:text-6xl font-bold tracking-tight text-stone-900">AlphaGo, 바둑의 패러다임을 바꾸다</h1>
+                <p class="mt-6 max-w-3xl mx-auto text-lg md:text-xl text-stone-600">
+                    딥마인드가 개발한 AlphaGo는 심층 신경망과 트리 탐색을 결합하여, 인류 역사상 가장 복잡한 게임으로 여겨졌던 바둑에서 프로 기사를 이긴 최초의 인공지능입니다. 이 페이지는 AlphaGo의 핵심 기술을 대화형으로 탐색하여 그 원리를 쉽게 이해할 수 있도록 돕습니다.
+                </p>
+            </div>
+        </section>
+
+        <section id="learning" class="py-20 sm:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">AlphaGo는 어떻게 학습하는가?</h2>
+                    <p class="mt-4 text-lg text-stone-600">AlphaGo의 학습 과정은 크게 3단계로 이루어집니다. 각 단계를 클릭하여 자세한 설명을 확인해보세요.</p>
+                </div>
+
+                <div class="mt-16 flex flex-col md:flex-row items-center justify-center gap-8 text-center">
+                    <div id="diagram-sl" class="diagram-box p-6 border-2 border-stone-200 rounded-lg shadow-md w-full md:w-1/4 cursor-pointer">
+                        <div class="text-5xl mb-4">👨‍🏫📊</div>
+                        <h3 class="text-xl font-bold text-blue-600">정책망 (지도학습)</h3>
+                        <p class="text-sm text-stone-500 mt-2">인간 고수의 기보를 학습하여 '직관'을 배웁니다.</p>
+                    </div>
+                    <div class="text-4xl font-bold text-stone-400 mx-4">→</div>
+                    <div id="diagram-rl" class="diagram-box p-6 border-2 border-stone-200 rounded-lg shadow-md w-full md:w-1/4 cursor-pointer">
+                        <div class="text-5xl mb-4">🎮</div>
+                        <h3 class="text-xl font-bold text-blue-600">정책망 (강화학습)</h3>
+                        <p class="text-sm text-stone-500 mt-2">스스로 대국하며 '승리하는 법'을 터득합니다.</p>
+                    </div>
+                    <div class="text-4xl font-bold text-stone-400 mx-4">→</div>
+                    <div id="diagram-value" class="diagram-box p-6 border-2 border-stone-200 rounded-lg shadow-md w-full md:w-1/4 cursor-pointer">
+                         <div class="text-5xl mb-4">💎</div>
+                        <h3 class="text-xl font-bold text-blue-600">가치망</h3>
+                        <p class="text-sm text-stone-500 mt-2">강화학습 결과를 통해 '판세'를 판단하는 능력을 기릅니다.</p>
+                    </div>
+                </div>
+
+                <div id="diagram-explanation" class="mt-12 p-8 bg-stone-100 rounded-lg min-h-[200px] transition-all duration-300">
+                    <h4 id="exp-title" class="text-2xl font-bold text-stone-800 mb-2">학습 단계 설명</h4>
+                    <p id="exp-content" class="text-stone-700">위 다이어그램의 각 단계를 클릭하면 이곳에 자세한 설명이 표시됩니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <section id="thinking" class="py-20 sm:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                 <div class="text-center">
+                    <h2 class="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">AlphaGo는 어떻게 생각하는가?</h2>
+                    <p class="mt-4 text-lg text-stone-600">AlphaGo는 학습된 신경망을 몬테카를로 트리 탐색(MCTS)과 결합하여 다음 수를 결정합니다. 이 4단계 과정을 반복하며 최적의 수를 찾아냅니다.</p>
+                </div>
+                
+                <div id="mcts-container" class="mt-16 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+                     <!-- MCTS steps will be injected here by JS -->
+                </div>
+
+                <div id="mcts-explanation" class="mt-12 p-8 bg-stone-100 rounded-lg min-h-[220px] transition-all duration-300">
+                    <h4 id="mcts-exp-title" class="text-2xl font-bold text-stone-800 mb-2">탐색 단계 설명</h4>
+                    <p id="mcts-exp-content" class="text-stone-700">위 다이어그램의 각 단계를 클릭하면 이곳에 자세한 설명이 표시됩니다.</p>
+                </div>
+            </div>
+        </section>
+
+
+        <section id="performance" class="py-20 sm:py-24 bg-white">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center">
+                    <h2 class="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">AlphaGo의 압도적인 성능</h2>
+                    <p class="mt-4 text-lg text-stone-600">AlphaGo는 다른 최상위 바둑 프로그램들을 상대로 99.8%의 승률을 기록했으며, 유럽 챔피언 판 후이와의 대결에서 5-0으로 승리했습니다.</p>
+                </div>
+                <div class="mt-16">
+                    <div class="chart-container">
+                        <canvas id="eloChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="interactive-demo" class="py-20 sm:py-24">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                <div class="text-center mb-16">
+                    <h2 class="text-3xl font-bold tracking-tight text-stone-900 sm:text-4xl">AlphaGo의 수읽기 시각화</h2>
+                    <p class="mt-4 text-lg text-stone-600">AlphaGo가 판 후이와의 대국에서 어떻게 다음 수를 결정했는지 직접 확인해보세요. 각 뷰를 선택하여 AlphaGo의 '생각'을 시각적으로 탐색할 수 있습니다.</p>
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 items-start">
+                    <div class="w-full max-w-xl mx-auto">
+                        <div id="go-board-container" class="go-board shadow-2xl rounded-lg"></div>
+                    </div>
+                    <div class="lg:pt-4">
+                        <div class="flex flex-wrap gap-2 mb-6">
+                            <button data-view="value" class="view-btn bg-blue-500 text-white px-4 py-2 rounded-md font-semibold">가치망 뷰</button>
+                            <button data-view="policy" class="view-btn bg-stone-200 text-stone-700 px-4 py-2 rounded-md font-semibold">정책망 뷰</button>
+                            <button data-view="simulation" class="view-btn bg-stone-200 text-stone-700 px-4 py-2 rounded-md font-semibold">시뮬레이션 뷰</button>
+                            <button data-view="final" class="view-btn bg-stone-200 text-stone-700 px-4 py-2 rounded-md font-semibold">최종 선택</button>
+                        </div>
+                        <div id="demo-explanation" class="p-6 bg-white rounded-lg shadow-lg min-h-[250px]">
+                            <h4 id="demo-title" class="text-2xl font-bold text-stone-800 mb-2">가치망 뷰</h4>
+                            <p id="demo-content" class="text-stone-700">
+                                가치망은 각 위치에 돌을 놓았을 때의 예상 승률을 평가합니다. 푸른색이 진할수록 AlphaGo(흑)의 승리 확률이 높다고 판단한 위치입니다. 가장 진한 파란색 원(T10)이 가치망이 평가한 최적의 수입니다.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="bg-stone-800 text-white py-8">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+            <p>이 페이지는 Nature에 게재된 "Mastering the game of Go with deep neural networks and tree search" 논문을 기반으로 제작되었습니다.</p>
+            <p class="text-sm text-stone-400 mt-2">Interactive SPA by Gemini</p>
+        </div>
+    </footer>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const learningDiagrams = {
+        sl: {
+            title: '1. 정책망 (지도학습 - SL)',
+            content: "인간 전문가들의 기보 데이터 약 3천만 개를 학습합니다. 이 단계의 목표는 인간 고수들이 특정 상황에서 어떤 수를 두는지 모방하는 것입니다. 이를 통해 AlphaGo는 바둑의 기본적인 패턴과 유망한 수를 예측하는 '직관'을 얻게 됩니다. 이 지도학습 정책망은 인간 전문가의 수를 57% 정확도로 예측할 수 있습니다. 이 정책망은 이후 강화학습의 출발점으로 사용됩니다."
+        },
+        rl: {
+            title: '2. 정책망 (강화학습 - RL)',
+            content: "지도학습으로 얻은 정책망을 초기 모델로 하여, AlphaGo 스스로 수많은 대국을 진행하며 학습합니다. 단순히 인간을 모방하는 것을 넘어 '게임에서 이기는 것' 자체를 목표로 정책을 개선합니다. 이전 버전의 자신과 대결하며 승리라는 보상을 통해 더 강한 전략을 터득합니다. 이를 통해 SL 정책망 대비 80% 이상의 승률을 달성합니다."
+        },
+        value: {
+            title: '3. 가치망 (Value Network)',
+            content: "강화학습을 통해 강해진 정책망이 스스로 대국한 기보를 다시 학습합니다. 이 단계의 목표는 특정 바둑판 상황이 주어졌을 때, 현재 플레이어의 최종 승리 확률을 예측하는 것입니다. 즉, '판세가 얼마나 유리한가'를 수치로 평가하는 능력을 기릅니다. 이 가치망은 MCTS 과정에서 탐색의 깊이를 줄여주는 결정적인 역할을 합니다. 덕분에 AlphaGo는 수를 더 깊이 읽지 않고도, 전략적으로 유리한 수를 빠르게 선택할 수 있게 됩니다."
+        }
+    };
+
+    const expTitle = document.getElementById('exp-title');
+    const expContent = document.getElementById('exp-content');
+    const diagramBoxes = document.querySelectorAll('.diagram-box');
+
+    diagramBoxes.forEach(box => {
+        box.addEventListener('click', () => {
+            diagramBoxes.forEach(b => b.classList.remove('active'));
+            box.classList.add('active');
+            const type = box.id.split('-')[1];
+            expTitle.textContent = learningDiagrams[type].title;
+            expContent.textContent = learningDiagrams[type].content;
+        });
+    });
+
+    const mctsData = [
+        { id: 'selection', title: '1. 선택 (Selection)', icon: '🎯', content: '현재 탐색 트리에서 가장 유망한 경로를 선택하여 내려갑니다. 이때 단순히 승률이 높은 수뿐만 아니라, 탐색 횟수가 적어 아직 잠재력이 확인되지 않은 수도 함께 고려합니다. 정책망이 제안한 사전 확률이 높은 수가 초반에 선택될 확률이 높습니다.' },
+        { id: 'expansion', title: '2. 확장 (Expansion)', icon: '📊', content: '경로의 끝, 즉 아직 탐색되지 않은 새로운 바둑판 상황(리프 노드)에 도달하면 트리를 확장합니다. 이때 SL 정책망을 이용해 가능한 다음 수들의 초기 유망도(사전 확률)를 계산하여 저장합니다.' },
+        { id: 'evaluation', title: '3. 평가 (Evaluation)', icon: '⚖️', content: '확장된 노드의 가치를 두 가지 방법으로 평가합니다. 첫째, 가치망을 통해 현재 판의 승률을 즉시 예측합니다. 둘째, 가볍고 빠른 롤아웃 정책망을 사용해 게임이 끝날 때까지 시뮬레이션(롤아웃)을 돌려 승패를 확인합니다. 이 두 평가 결과를 혼합하여 최종 가치를 결정합니다.' },
+        { id: 'backup', title: '4. 백업 (Backup)', icon: '📈', content: '평가 단계에서 얻은 결과를 다시 트리를 거슬러 올라가면서 경로상의 모든 노드에 반영합니다. 이 과정을 통해 각 노드의 승률 통계(액션 가치)가 업데이트됩니다. 이 4단계를 수없이 반복하면 통계가 점점 더 정확해집니다. 앞의 과정들을 수천 번 반복한 뒤, 최종적으로 가장 많이 탐색된 수를 실제 수로 선택합니다.' },
+    ];
+    
+    const mctsContainer = document.getElementById('mcts-container');
+    mctsData.forEach(step => {
+        const div = document.createElement('div');
+        div.id = `mcts-${step.id}`;
+        div.className = 'diagram-box p-6 border-2 border-stone-200 rounded-lg shadow-md w-full cursor-pointer text-center';
+        div.innerHTML = `
+            <div class="text-5xl mb-4">${step.icon}</div>
+            <h3 class="text-xl font-bold text-blue-600">${step.title}</h3>
+            <p class="text-sm text-stone-500 mt-2">${step.content.split(' ').slice(0, 8).join(' ')}...</p>
+        `;
+        mctsContainer.appendChild(div);
+    });
+
+    const mctsBoxes = document.querySelectorAll('#mcts-container .diagram-box');
+    const mctsExpTitle = document.getElementById('mcts-exp-title');
+    const mctsExpContent = document.getElementById('mcts-exp-content');
+    
+    mctsBoxes.forEach((box, index) => {
+        box.addEventListener('click', () => {
+            mctsBoxes.forEach(b => b.classList.remove('active'));
+            box.classList.add('active');
+            mctsExpTitle.textContent = mctsData[index].title;
+            mctsExpContent.textContent = mctsData[index].content;
+        });
+    });
+
+    const ctx = document.getElementById('eloChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: ['Distributed AlphaGo', 'AlphaGo', 'Fan Hui', 'Crazy Stone', 'Zen', 'Pachi', 'Fuego', 'GnuGo'],
+            datasets: [{
+                label: 'Elo Rating',
+                data: [3140, 2890, 2908, 1929, 1888, 1298, 1148, 431],
+                backgroundColor: [
+                    '#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE', '#DBEAFE', '#EFF6FF', '#F9FAFB'
+                ],
+                borderColor: [
+                    '#1D4ED8', '#2563EB', '#3B82F6', '#60A5FA', '#93C5FD', '#BFDBFE', '#EFF6FF', '#E5E7EB'
+                ],
+                borderWidth: 1
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            indexAxis: 'y',
+            plugins: {
+                legend: { display: false },
+                title: { display: true, text: 'AlphaGo 및 다른 바둑 프로그램 Elo 레이팅 비교', font: { size: 16 } }
+            },
+            scales: {
+                x: { beginAtZero: true, grid: { color: 'rgba(0,0,0,0.05)' } },
+                y: { grid: { display: false } }
+            }
+        }
+    });
+
+    const boardContainer = document.getElementById('go-board-container');
+    const viewButtons = document.querySelectorAll('.view-btn');
+    const demoTitle = document.getElementById('demo-title');
+    const demoContent = document.getElementById('demo-content');
+
+    const fixedStones = [
+        {p: 'D16', c: 'b'}, {p: 'Q16', c: 'w'}, {p: 'D4', c: 'b'}, {p: 'Q4', c: 'w'}, {p: 'C10', c: 'b'}, {p: 'E11', c: 'w'}, {p: 'G12', c: 'b'}, {p: 'K16', c: 'w'}, {p: 'M17', c: 'b'}, {p: 'O17', c: 'w'},
+        {p: 'L15', c: 'b'}, {p: 'M15', c: 'w'}, {p: 'L16', c: 'b'}, {p: 'L14', c: 'w'}, {p: 'N14', c: 'b'}, {p: 'N15', c: 'w'}, {p: 'M14', c: 'b'}, {p: 'O15', c: 'w'}, {p: 'P14', c: 'b'}, {p: 'P15', c: 'w'},
+        {p: 'R14', c: 'b'}, {p: 'R15', c: 'w'}, {p: 'O16', c: 'b'}, {p: 'N16', c: 'w'}, {p: 'J17', c: 'b'}, {p: 'F16', c: 'w'}, {p: 'G16', c: 'b'}, {p: 'F15', c: 'w'}, {p: 'H16', c: 'b'}, {p: 'G15', c: 'w'},
+        {p: 'G14', c: 'b'}, {p: 'H15', c: 'w'}, {p: 'H14', c: 'b'}, {p: 'J15', c: 'w'}, {p: 'F14', c: 'b'}, {p: 'E14', c: 'w'}, {p: 'E15', c: 'b'}, {p: 'D15', c: 'w'}, {p: 'F3', c: 'b'}, {p: 'D12', c: 'w'},
+        {p: 'D11', c: 'b'}, {p: 'D10', c: 'w'}, {p: 'C11', c: 'b'}, {p: 'F10', c: 'w'}, {p: 'E10', c: 'b'}, {p: 'F11', c: 'w'}, {p: 'E9', c: 'b'}, {p: 'G9', c: 'w'}, {p: 'G8', c: 'b'}, {p: 'H9', c: 'w'},
+        {p: 'F8', c: 'b'}, {p: 'H8', c: 'w'}, {p: 'H7', c: 'b'}, {p: 'G7', c: 'w'}, {p: 'J8', c: 'b'}, {p: 'J7', c: 'w'}, {p: 'K8', c: 'b'}, {p: 'K7', c: 'w'}, {p: 'F7', c: 'b'}, {p: 'E7', c: 'w'},
+        {p: 'G6', c: 'b'}, {p: 'F6', c: 'w'}, {p: 'H6', c: 'b'}, {p: 'J6', c: 'w'}, {p: 'K6', c: 'b'}, {p: 'E6', c: 'w'}, {p: 'D6', c: 'b'}, {p: 'C6', c: 'w'}, {p: 'D7', c: 'b'}, {p: 'C7', c: 'w'},
+        {p: 'C8', c: 'b'}, {p: 'B8', c: 'w'}, {p: 'D8', c: 'b'}, {p: 'C9', c: 'w'}, {p: 'C5', c: 'b'}, {p: 'B5', c: 'w'}, {p: 'E5', c: 'b'}, {p: 'E4', c: 'w'}, {p: 'F5', c: 'b'}, {p: 'G5', c: 'w'},
+        {p: 'P3', c: 'b'}, {p: 'R4', c: 'w'}, {p: 'O6', c: 'b'}, {p: 'O5', c: 'w'}, {p: 'P6', c: 'b'}, {p: 'P5', c: 'w'}, {p: 'Q6', c: 'b'}, {p: 'Q5', c: 'w'}, {p: 'R6', c: 'b'}, {p: 'R5', c: 'w'},
+        {p: 'N6', c: 'b'}, {p: 'N5', c: 'w'}, {p: 'M6', c: 'b'}, {p: 'M5', c: 'w'}, {p: 'L6', c: 'b'}, {p: 'L5', c: 'w'}, {p: 'K5', c: 'b'}, {p: 'P8', c: 'w'}, {p: 'P9', c: 'b'}, {p: 'O8', c: 'w'},
+        {p: 'O9', c: 'b'}, {p: 'N8', c: 'w'}, {p: 'N9', c: 'b'}, {p: 'Q9', c: 'w'}, {p: 'R9', c: 'b'}, {p: 'S9', c: 'w'}, {p: 'S8', c: 'b'}, {p: 'T8', c: 'w'}, {p: 'R8', c: 'b'}, {p: 'Q8', c: 'w'}
+    ];
+    
+    const demoData = {
+        value: {
+            title: '가치망 뷰 (Value Network)',
+            content: "가치망은 각 위치에 돌을 놓았을 때의 예상 승률을 평가합니다. 푸른색이 진할수록 AlphaGo(흑)의 승리 확률이 높다고 판단한 위치입니다. 가장 진한 T10(파란색 원)이 가치망이 평가한 최적의 수입니다.",
+            heatmap: [{p: 'T10', v: 0.9}, {p: 'S10', v: 0.7}, {p: 'S11', v: 0.6}, {p: 'R10', v: 0.5}],
+            marker: {p: 'T10', type: 'circle_blue'}
+        },
+        policy: {
+            title: '정책망 뷰 (Policy Network)',
+            content: "정책망은 인간 전문가의 기보를 학습하여, 현재 상황에서 둘 만한 후보 수들의 확률을 예측합니다. 녹색이 진할수록 정책망이 추천하는 확률이 높은 위치입니다. 정책망의 최고 추천수 J10(녹색 원)은 가치망의 판단과 다를 수 있으며, 이는 AlphaGo가 하나의 '뇌'에만 의존하지 않음을 보여줍니다.",
+            heatmap: [{p: 'J10', v: 0.8}, {p: 'K10', v: 0.5}, {p: 'L10', v: 0.4}, {p: 'M10', v: 0.3}],
+            marker: {p: 'J10', type: 'circle_green'}
+        },
+        simulation: {
+            title: '시뮬레이션 뷰 (MCTS)',
+            content: "MCTS는 가치망과 정책망의 정보를 종합하여 수많은 시뮬레이션을 실행합니다. 붉은색이 진할수록 시뮬레이션 과정에서 많이 방문한, 즉 최종적으로 선택될 가능성이 높은 위치입니다. 탐색 결과, 가치망이 높게 평가했던 T10(붉은 원)이 가장 많이 탐색되었음을 알 수 있습니다.",
+            heatmap: [{p: 'T10', v: 1.0}, {p: 'S10', v: 0.4}, {p: 'J10', v: 0.2}],
+            marker: {p: 'T10', type: 'circle_red'}
+        },
+        final: {
+            title: '최종 선택',
+            content: "모든 정보를 종합하여, AlphaGo는 가장 많이 시뮬레이션된 T10(붉은 원)을 최종 수로 선택했습니다. 판 후이는 경기 후 복기에서 자신이 생각한 수 S10(백색 사각형)보다 이 수가 더 좋은 수였다고 평가한 바로 그 자리였습니다.",
+            heatmap: [],
+            marker: {p: 'T10', type: 'circle_red'},
+            extra_marker: {p: 'S10', type: 'square_white'}
+        }
+    };
+
+    const cols = 'ABCDEFGHJKLMNOPQRST'.split('');
+    const rows = Array.from({length: 19}, (_, i) => 19 - i);
+
+    for (let r = 0; r < 19; r++) {
+        for (let c = 0; c < 19; c++) {
+            const intersection = document.createElement('div');
+            intersection.className = 'go-intersection';
+            const id = `${cols[c]}${rows[r]}`;
+            intersection.id = `cell-${id}`;
+            const heatmap = document.createElement('div');
+            heatmap.className = 'go-heatmap';
+            intersection.appendChild(heatmap);
+            boardContainer.appendChild(intersection);
+        }
+    }
+    
+    fixedStones.forEach(stone => {
+        const cell = document.getElementById(`cell-${stone.p}`);
+        if (cell) {
+            const stoneDiv = document.createElement('div');
+            stoneDiv.className = `go-stone ${stone.c === 'b' ? 'bg-black' : 'bg-white'}`;
+            cell.appendChild(stoneDiv);
+        }
+    });
+
+    function updateDemo(view) {
+        viewButtons.forEach(btn => {
+            btn.classList.remove('bg-blue-500', 'text-white');
+            btn.classList.add('bg-stone-200', 'text-stone-700');
+        });
+        document.querySelector(`button[data-view="${view}"]`).classList.add('bg-blue-500', 'text-white');
+
+        demoTitle.textContent = demoData[view].title;
+        demoContent.textContent = demoData[view].content;
+
+        document.querySelectorAll('.go-heatmap').forEach(el => el.style.backgroundColor = 'transparent');
+        document.querySelectorAll('.go-marker').forEach(el => el.remove());
+
+        const data = demoData[view];
+        data.heatmap.forEach(item => {
+            const cell = document.querySelector(`#cell-${item.p} .go-heatmap`);
+            if (cell) {
+                let color;
+                if(view === 'value') color = `rgba(37, 99, 235, ${item.v})`; // blue
+                else if(view === 'policy') color = `rgba(22, 163, 74, ${item.v})`; // green
+                else if(view === 'simulation') color = `rgba(220, 38, 38, ${item.v})`; // red
+                cell.style.backgroundColor = color;
+            }
+        });
+
+        if (data.marker) {
+            const cell = document.getElementById(`cell-${data.marker.p}`);
+            if (cell) {
+                const markerDiv = document.createElement('div');
+                markerDiv.className = 'go-marker';
+                if(data.marker.type === 'circle_blue') markerDiv.style.border = '3px solid #1d4ed8';
+                if(data.marker.type === 'circle_green') markerDiv.style.border = '3px solid #15803d';
+                if(data.marker.type === 'circle_red') markerDiv.style.border = '3px solid #b91c1c';
+                markerDiv.style.borderRadius = '50%';
+                cell.appendChild(markerDiv);
+            }
+        }
+        
+        if (data.extra_marker) {
+            const cell = document.getElementById(`cell-${data.extra_marker.p}`);
+            if(cell) {
+                const markerDiv = document.createElement('div');
+                markerDiv.className = 'go-marker';
+                markerDiv.style.border = '3px solid #ffffff';
+                cell.appendChild(markerDiv);
+            }
+        }
+    }
+
+    viewButtons.forEach(button => {
+        button.addEventListener('click', () => {
+            updateDemo(button.dataset.view);
+        });
+    });
+
+    updateDemo('value');
+    diagramBoxes[0].click();
+    mctsBoxes[0].click();
+});
+</script>
+</body>
+</html>
