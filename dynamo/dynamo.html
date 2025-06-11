@@ -1,0 +1,585 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dynamo: 대화형 심층 분석</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+SansKR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutrals -->
+    <!-- Application Structure Plan: A single-page dashboard application divided into thematic sections: 1. Introduction (Why Dynamo?), 2. Core Principles (Interactive visual breakdown of key technologies like Consistent Hashing, Replication, Versioning), 3. Performance Dashboard (Dynamic charts for latency, load balancing, etc.), 4. Configuration Simulator (Interactive tool to explore N, R, W trade-offs), 5. Architecture (Visual flows for failure handling). This structure prioritizes user engagement and conceptual understanding over a linear report format. Navigation is handled by a sticky top bar for easy access to all sections. -->
+    <!-- Visualization & Content Choices: 
+        - Introduction: Text blocks to explain the problem Dynamo solves. Goal: Inform.
+        - Core Principles: A grid of interactive cards. Goal: Organize & Explain. Method: HTML/CSS grid. Interaction: Clicking a card reveals detailed text, providing a layered learning experience.
+        - Performance Dashboard: A collection of dynamic charts. Goal: Compare & Analyze. Method: Chart.js for line, bar, and donut charts. Interaction: Toggling datasets on charts to compare different metrics.
+        - Configuration Simulator: Interactive sliders. Goal: Explore & Understand Trade-offs. Method: HTML range inputs and JS to dynamically update descriptive text and visual indicators.
+        - Architecture Flow: Static visual diagrams. Goal: Explain Process. Method: Structured HTML/CSS using Flexbox to illustrate processes like Hinted Handoff and Merkle Trees.
+        - Library/Method: Chart.js for all charts on Canvas, Tailwind CSS for layout and styling, Vanilla JS for all interactions.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
+    <style>
+        body { font-family: 'Noto Sans KR', sans-serif; background-color: #f8fafc; }
+        .chart-container { position: relative; width: 100%; max-width: 800px; margin-left: auto; margin-right: auto; height: 350px; max-height: 50vh; }
+        .smooth-scroll { scroll-behavior: smooth; }
+        .section-title { font-size: 2.25rem; font-weight: 700; color: #1e293b; border-bottom: 3px solid #0d9488; padding-bottom: 0.5rem; margin-bottom: 1.5rem; }
+        .card { background-color: white; border-radius: 0.75rem; box-shadow: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1); transition: transform 0.2s, box-shadow 0.2s; }
+        .card:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1); }
+        .nav-item { padding: 0.5rem 1rem; color: #475569; font-weight: 500; border-radius: 0.375rem; transition: background-color 0.2s, color 0.2s; }
+        .nav-item:hover, .nav-item.active { background-color: #f0fdfa; color: #0d9488; }
+        .slider-label { min-width: 100px; } /* Kept for general styling, not specifically for sliders anymore */
+        .value-control {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            max-width: 200px; /* Adjust as needed for button width */
+            margin-left: auto;
+            margin-right: auto;
+        }
+        .control-button {
+            padding: 0.5rem 1rem;
+            background-color: #0d9488;
+            color: white;
+            border-radius: 0.375rem;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .control-button:hover {
+            background-color: #0f766e;
+        }
+        .control-value {
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0d9488;
+            min-width: 40px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-700 smooth-scroll">
+
+    <!-- Header & Navigation -->
+    <header class="bg-white/80 backdrop-blur-lg sticky top-0 z-50 shadow-sm">
+        <div class="container mx-auto px-4">
+            <div class="flex items-center justify-between h-16">
+                <h1 class="text-2xl font-bold text-teal-700">Dynamo: 대화형 심층 분석</h1>
+                <nav class="hidden md:flex items-center space-x-2">
+                    <a href="#intro" class="nav-item">소개</a>
+                    <a href="#principles" class="nav-item">핵심 원리</a>
+                    <a href="#dashboard" class="nav-item">성능 대시보드</a>
+                    <a href="#simulator" class="nav-item">설정 시뮬레이터</a>
+                    <a href="#architecture" class="nav-item">아키텍처</a>
+                </nav>
+            </div>
+        </div>
+    </header>
+
+    <main class="container mx-auto px-4 py-8">
+
+        <!-- 1. Introduction Section -->
+        <section id="intro" class="py-16">
+            <h2 class="section-title">소개: Dynamo는 왜 필요했을까요?</h2>
+            <div class="space-y-6 text-lg max-w-4xl mx-auto">
+                <p class="leading-relaxed">Amazon.com과 같은 거대 플랫폼에서는 아주 작은 서비스 장애도 막대한 금전적 손실과 고객 신뢰도 하락으로 이어집니다. 수만 대의 서버로 구성된 인프라에서는 장애가 일상적으로 발생하며, 이러한 환경에서 데이터를 안정적으로 관리하는 것이 시스템의 성패를 좌우합니다. 이 섹션에서는 기존 관계형 데이터베이스(RDBMS)의 한계와 Dynamo가 탄생하게 된 배경을 설명합니다.</p>
+                <div class="bg-white p-6 rounded-lg shadow-md border-l-4 border-teal-500">
+                    <h3 class="text-xl font-bold text-slate-800 mb-2">핵심 문제: 가용성 vs 일관성</h3>
+                    <p>기존의 RDBMS는 데이터의 '일관성'을 최우선으로 합니다. 하지만 이로 인해 서버 장애나 네트워크 단절 시 데이터베이스 접근이 아예 불가능해지는 '가용성' 문제가 발생할 수 있습니다. 예를 들어, 고객이 쇼핑 카트에 상품을 추가하려는 순간 DB 서버에 문제가 생긴다면, 작업은 실패하고 고객은 불편을 겪게 됩니다. Amazon은 어떤 상황에서도 서비스가 멈추지 않는, 즉 '항상 쓰기 가능한(always writeable)' 스토리지 시스템을 필요로 했습니다. Dynamo는 바로 이 문제를 해결하기 위해, 일관성을 어느 정도 희생하는 대신 극강의 가용성을 확보하는 방향으로 설계되었습니다.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- 2. Core Principles Section -->
+        <section id="principles" class="py-16 bg-slate-100 rounded-2xl">
+            <h2 class="section-title text-center">핵심 원리: Dynamo는 어떻게 작동할까요?</h2>
+             <p class="text-lg text-center max-w-4xl mx-auto mb-12">Dynamo는 고가용성과 확장성을 달성하기 위해 여러 분산 시스템 기술을 독창적으로 조합했습니다. 각 카드를 클릭하여 데이터 분산, 복제, 버전 관리 및 장애 처리 방식에 대한 핵심 원리를 자세히 알아보세요. 이 원리들이 어떻게 상호작용하여 견고한 시스템을 만드는지 이해할 수 있습니다.</p>
+            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8 max-w-7xl mx-auto">
+                <!-- Card: Consistent Hashing -->
+                <div class="card p-6" onclick="toggleDetail('detail1')">
+                    <h3 class="text-xl font-bold text-teal-600 mb-2">데이터 분할: 일관된 해싱</h3>
+                    <p>데이터를 여러 서버에 어떻게 효율적으로 분산할까요? Dynamo는 '일관된 해싱'을 사용합니다.</p>
+                    <div id="detail1" class="hidden mt-4 text-sm space-y-2">
+                        <p>모든 서버와 데이터 키를 하나의 원형 공간에 배치합니다. 데이터는 자신의 위치에서 시계 방향으로 가장 가까운 서버에 저장됩니다. 이 방식의 가장 큰 장점은 서버가 추가되거나 제거될 때 데이터 재분배를 최소화하여 시스템 영향을 줄이는 것입니다.</p>
+                        <p><strong>가상 노드:</strong> 부하를 더욱 균일하게 분산시키기 위해, 각 물리 서버는 링 위에서 여러 개의 '가상 노드' 역할을 합니다. 이는 특정 서버에 부하가 몰리는 것을 방지하고 유연한 확장을 가능하게 합니다.</p>
+                    </div>
+                </div>
+                <!-- Card: Replication -->
+                <div class="card p-6" onclick="toggleDetail('detail2')">
+                    <h3 class="text-xl font-bold text-teal-600 mb-2">데이터 복제: N개의 복제본</h3>
+                    <p>서버가 고장나도 데이터 유실 없이 서비스를 유지하는 비결은 '복제'입니다.</p>
+                    <div id="detail2" class="hidden mt-4 text-sm space-y-2">
+                        <p>각 데이터는 N개의 서버에 복제되어 저장됩니다(보통 N=3). 데이터의 원본을 저장하는 '코디네이터' 노드는 링 상의 다음 N-1개 노드에 복제본을 전송합니다.</p>
+                        <p><strong>선호 목록(Preference List):</strong> 특정 키를 저장할 책임이 있는 노드들의 목록입니다. 장애에 대비하여 N개 이상의 노드를 포함시켜, 일부 노드가 다운되어도 다른 노드가 그 역할을 대신할 수 있도록 합니다.</p>
+                    </div>
+                </div>
+                <!-- Card: Versioning -->
+                <div class="card p-6" onclick="toggleDetail('detail3')">
+                    <h3 class="text-xl font-bold text-teal-600 mb-2">버전 관리: 벡터 클록</h3>
+                    <p>여러 서버에서 데이터가 동시에 수정될 때 발생하는 '충돌'은 어떻게 해결할까요?</p>
+                    <div id="detail3" class="hidden mt-4 text-sm space-y-2">
+                        <p>Dynamo는 '<strong style="color: #0f766e;">결과적 일관성</strong>' (eventual consistency) 모델을 따르며, 데이터의 모든 변경사항을 새로운 버전으로 취급합니다. 이때 '벡터 클록'을 사용하여 버전 간의 인과 관계를 추적합니다. 만약 두 버전이 서로의 변경사항을 포함하지 않는 '충돌' 상태라면, Dynamo는 두 버전을 모두 반환하여 애플리케이션이 비즈니스 로직에 맞게 병합하도록 합니다 (예: 쇼핑 카트 병합).</p>
+                        <p>이는 쓰기 요청을 절대 거부하지 않기 위한 핵심적인 설계 결정입니다.</p>
+                    </div>
+                </div>
+                 <!-- Card: Quorum -->
+                <div class="card p-6" onclick="toggleDetail('detail4')">
+                    <h3 class="text-xl font-bold text-teal-600 mb-2">쿼럼: R과 W를 이용한 일관성 조절</h3>
+                    <p>읽기/쓰기 작업의 성공 기준을 정하여 일관성 수준을 조절합니다.</p>
+                    <div id="detail4" class="hidden mt-4 text-sm space-y-2">
+                        <p><strong>W (Write Quorum):</strong> 쓰기 작업이 성공으로 간주되기 위해 응답해야 하는 최소 복제본 수.</p>
+                        <p><strong>R (Read Quorum):</strong> 읽기 작업이 성공으로 간주되기 위해 응답해야 하는 최소 복제본 수.</p>
+                        <p>일반적으로 `R + W > N` 규칙을 따라 읽기와 쓰기가 항상 최신 데이터를 공유하도록 보장합니다. 이 값들을 조절하여 애플리케이션의 요구사항에 맞게 일관성과 가용성 사이의 균형을 맞출 수 있습니다. (아래 시뮬레이터에서 직접 체험해보세요!)</p>
+                    </div>
+                </div>
+                <!-- Card: Hinted Handoff -->
+                <div class="card p-6" onclick="toggleDetail('detail5')">
+                    <h3 class="text-xl font-bold text-teal-600 mb-2">장애 처리 1: Hinted Handoff</h3>
+                    <p>일시적인 서버 장애 시에도 쓰기 요청을 중단 없이 처리하는 기술입니다.</p>
+                    <div id="detail5" class="hidden mt-4 text-sm space-y-2">
+                        <p>만약 데이터 복제본을 받아야 할 노드 A가 다운되었다면, 복제본은 임시로 다른 노드 D에게 전달됩니다. 이때 "이 데이터는 원래 A의 것"이라는 '힌트'가 함께 저장됩니다. 이후 노드 A가 복구되면, D는 저장하고 있던 데이터를 A에게 전달해줍니다. 이를 통해 시스템은 잠시의 장애에도 멈추지 않고 동작합니다.</p>
+                    </div>
+                </div>
+                <!-- Card: Merkle Trees -->
+                <div class="card p-6" onclick="toggleDetail('detail6')">
+                    <h3 class="text-xl font-bold text-teal-600 mb-2">장애 처리 2: 머클 트리를 이용한 동기화</h3>
+                    <p>장애 복구 후, 데이터 불일치를 어떻게 빠르고 효율적으로 찾아낼까요?</p>
+                    <div id="detail6" class="hidden mt-4 text-sm space-y-2">
+                        <p>Dynamo는 '머클 트리'라는 해시 트리 자료구조를 사용하여 복제본 간의 데이터 차이를 신속하게 감지합니다. 전체 데이터를 비교할 필요 없이 트리의 상위 해시 값만 비교하여 불일치 여부를 파악하고, 다른 부분만 정확히 찾아내 동기화함으로써 네트워크와 시스템 부하를 최소화합니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 3. Performance Dashboard Section -->
+        <section id="dashboard" class="py-16">
+            <h2 class="section-title text-center">성능 대시보드</h2>
+            <p class="text-lg text-center max-w-4xl mx-auto mb-12">이론뿐만 아니라 실제 운영 환경에서 Dynamo가 어떤 성능을 보이는지 살펴보세요. 이 대시보드는 Amazon의 프로덕션 환경에서 측정된 지연 시간, 부하 분산, 버전 충돌 등에 대한 데이터를 시각화합니다. 차트와 상호작용하며 Dynamo의 성능 특성을 깊이 있게 탐색할 수 있습니다.</p>
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">읽기/쓰기 지연 시간 (Latency)</h3>
+                    <p class="text-sm mb-4">피크 시즌 동안의 시간당 지연 시간. 평균(Avg)과 상위 99.9%의 성능 차이에 주목하세요.</p>
+                    <div class="chart-container"><canvas id="latencyChart"></canvas></div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">쓰기 버퍼링 효과</h3>
+                    <p class="text-sm mb-4">메모리 버퍼를 사용한 쓰기 최적화가 상위 99.9% 지연 시간을 얼마나 개선하는지 보여줍니다.</p>
+                    <div class="chart-container"><canvas id="bufferingChart"></canvas></div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">부하 분산 효율성</h3>
+                    <p class="text-sm mb-4">데이터 파티셔닝 전략에 따른 부하 분산 효율 비교. Strategy 3이 가장 우수합니다.</p>
+                    <div class="chart-container"><canvas id="loadBalancingChart"></canvas></div>
+                </div>
+                <div class="card p-6">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-2">데이터 버전 충돌 비율</h3>
+                    <p class="text-sm mb-4">24시간 동안 쇼핑 카트 서비스에서 발생한 데이터 버전 충돌 비율. 대부분(99.94%)은 충돌이 없습니다.</p>
+                    <div class="chart-container h-80 max-h-[40vh]"><canvas id="divergenceChart"></canvas></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- 4. Configuration Simulator Section -->
+        <section id="simulator" class="py-16 bg-slate-100 rounded-2xl">
+            <h2 class="section-title text-center">설정 시뮬레이터: N, R, W 트레이드오프</h2>
+            <p class="text-lg text-center max-w-4xl mx-auto mb-12">아래 버튼을 조작하여 각 파라미터가 읽기성능, 쓰기성능, 일관성에 어떤 영향을 미치는지 직접 확인해보세요. 이 시뮬레이터에서는 N(복제본 수)은 3으로 고정됩니다.</p>
+            <div class="card max-w-3xl mx-auto p-8">
+                <div class="space-y-6">
+                    <!-- N (복제본 수)는 고정되어 있으므로 값만 표시 -->
+                    <div class="flex items-center space-x-4">
+                        <label class="font-bold text-lg slider-label">N (복제본 수):</label>
+                        <span class="font-bold text-lg text-teal-600 w-8 text-center">3</span>
+                    </div>
+                    <!-- R Control -->
+                    <div class="flex items-center space-x-4">
+                        <label class="font-bold text-lg slider-label">R (읽기 쿼럼):</label>
+                        <div class="value-control">
+                            <button id="r_decrement" class="control-button">-</button>
+                            <span id="r_value" class="control-value">2</span>
+                            <button id="r_increment" class="control-button">+</button>
+                        </div>
+                    </div>
+                    <!-- W Control -->
+                    <div class="flex items-center space-x-4">
+                        <label class="font-bold text-lg slider-label">W (쓰기 쿼럼):</label>
+                        <div class="value-control">
+                            <button id="w_decrement" class="control-button">-</button>
+                            <span id="w_value" class="control-value">2</span>
+                            <button id="w_increment" class="control-button">+</button>
+                        </div>
+                    </div>
+                </div>
+                <div id="simulator-result" class="mt-8 p-6 bg-slate-50 rounded-lg border border-slate-200">
+                    <h4 class="font-bold text-xl mb-4 text-slate-800">결과 분석</h4>
+                    <div id="quorum-status" class="mb-4 p-3 rounded-md text-center font-semibold"></div>
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+                        <div>
+                            <h5 class="font-semibold text-slate-600">읽기 성능/가용성</h5>
+                            <p id="read-availability" class="text-2xl font-bold"></p>
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-slate-600">쓰기 성능/가용성</h5>
+                            <p id="write-availability" class="text-2xl font-bold"></p>
+                        </div>
+                        <div>
+                            <h5 class="font-semibold text-slate-600">일관성/내구성</h5>
+                            <p id="consistency" class="text-2xl font-bold"></p>
+                        </div>
+                    </div>
+                    <div class="mt-4 text-sm text-slate-500">
+                        <p id="simulator-desc"></p>
+                    </div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- 5. Architecture Section -->
+        <section id="architecture" class="py-16">
+            <h2 class="section-title text-center">아키텍처 흐름</h2>
+            <p class="text-lg text-center max-w-4xl mx-auto mb-12">이 섹션에서는 장애 상황에서 Dynamo가 어떻게 데이터를 안정적으로 처리하고 복구하는지 시각적인 흐름을 통해 보여줍니다. Hinted Handoff와 Merkle Tree를 사용한 복제본 동기화 과정은 Dynamo의 견고함을 뒷받침하는 핵심적인 메커니즘입니다.</p>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+                <div class="card p-8">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-4">Hinted Handoff 흐름 (일시적 장애)</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-teal-500 text-white font-bold rounded-full flex items-center justify-center">1</div>
+                            <p>클라이언트가 노드 B에 데이터를 쓰려고 하지만, B가 일시적으로 다운됨.</p>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                             <div class="flex-shrink-0 w-8 h-8 bg-teal-500 text-white font-bold rounded-full flex items-center justify-center">2</div>
+                            <p>코디네이터는 쓰기 요청을 B 대신 다른 노드 D로 보냄. 이때 "이 데이터는 원래 B의 것"이라는 힌트를 함께 전달.</p>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                             <div class="flex-shrink-0 w-8 h-8 bg-teal-500 text-white font-bold rounded-full flex items-center justify-center">3</div>
+                            <p>노드 B가 복구되면, 노드 D는 B에게 힌트가 있던 데이터를 전달하고 자신은 해당 데이터를 삭제함.</p>
+                        </div>
+                        <div class="bg-teal-50 p-4 rounded-lg text-teal-800 font-medium">결과: 클라이언트는 노드 장애를 인지하지 못한 채 쓰기 작업을 성공적으로 마침.</div>
+                    </div>
+                </div>
+                 <div class="card p-8">
+                    <h3 class="text-xl font-semibold text-slate-800 mb-4">Merkle Tree 동기화 흐름 (영구적 장애 복구)</h3>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4">
+                             <div class="flex-shrink-0 w-8 h-8 bg-teal-500 text-white font-bold rounded-full flex items-center justify-center">1</div>
+                            <p>두 노드가 데이터 동기화를 위해 각자 가진 데이터 범위에 대한 Merkle Tree의 '루트 해시'를 교환함.</p>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                             <div class="flex-shrink-0 w-8 h-8 bg-teal-500 text-white font-bold rounded-full flex items-center justify-center">2</div>
+                            <p>루트 해시가 다르면, 자식 노드의 해시를 비교하며 트리를 내려감. 이 과정을 불일치가 발견될 때까지 반복.</p>
+                        </div>
+                         <div class="flex items-start space-x-4">
+                            <div class="flex-shrink-0 w-8 h-8 bg-teal-500 text-white font-bold rounded-full flex items-center justify-center">3</div>
+                            <p>최종적으로 다른 데이터 블록(키)을 식별하여 해당 데이터만 전송하여 동기화함.</p>
+                        </div>
+                         <div class="bg-teal-50 p-4 rounded-lg text-teal-800 font-medium">결과: 전체 데이터를 비교하지 않고 변경된 부분만 효율적으로 동기화하여 시스템 부하를 최소화함.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-slate-800 text-slate-300 py-6 text-center">
+        <p>이 웹페이지는 Dynamo 논문을 기반으로 제작된 교육용 자료입니다.</p>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            
+            // Navigation scroll highlighting
+            const sections = document.querySelectorAll('section');
+            const navItems = document.querySelectorAll('.nav-item');
+
+            window.addEventListener('scroll', () => {
+                let current = '';
+                sections.forEach(section => {
+                    const sectionTop = section.offsetTop;
+                    if (pageYOffset >= sectionTop - 80) {
+                        current = section.getAttribute('id');
+                    }
+                });
+
+                navItems.forEach(item => {
+                    item.classList.remove('active');
+                    if (item.getAttribute('href').includes(current)) {
+                        item.classList.add('active');
+                    }
+                });
+            });
+
+            // Card detail toggling
+            window.toggleDetail = function(id) {
+                const detail = document.getElementById(id);
+                detail.classList.toggle('hidden');
+            }
+
+            // Chart.js Implementations
+            const createLatencyChart = () => {
+                const ctx = document.getElementById('latencyChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: Array.from({length: 12}, (_, i) => `${i*2}h`),
+                        datasets: [
+                            {
+                                label: '99.9% 쓰기 (ms)',
+                                data: [380, 420, 500, 450, 480, 550, 620, 580, 500, 430, 400, 390],
+                                borderColor: 'rgb(20, 184, 166)',
+                                backgroundColor: 'rgba(20, 184, 166, 0.1)',
+                                tension: 0.4,
+                                borderWidth: 2,
+                            },
+                             {
+                                label: '99.9% 읽기 (ms)',
+                                data: [280, 310, 350, 320, 360, 400, 450, 410, 350, 300, 290, 280],
+                                borderColor: 'rgb(249, 115, 22)',
+                                backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                                tension: 0.4,
+                                borderWidth: 2,
+                            },
+                            {
+                                label: '평균 쓰기 (ms)',
+                                data: [20, 22, 28, 25, 29, 35, 40, 36, 28, 23, 21, 20],
+                                borderColor: 'rgb(14, 116, 144)',
+                                borderDash: [5, 5],
+                                tension: 0.4,
+                                borderWidth: 2,
+                            },
+                             {
+                                label: '평균 읽기 (ms)',
+                                data: [10, 11, 15, 13, 16, 20, 25, 22, 16, 12, 11, 10],
+                                borderColor: 'rgb(194, 65, 12)',
+                                borderDash: [5, 5],
+                                tension: 0.4,
+                                borderWidth: 2,
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                             y: {
+                                type: 'logarithmic',
+                                min: 10,
+                                max: 1000,
+                                ticks: {
+                                    callback: function(value, index, values) {
+                                        return Number(value.toString());
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: { mode: 'index', intersect: false },
+                            title: { display: false }
+                        },
+                    }
+                });
+            };
+
+            const createBufferingChart = () => {
+                const ctx = document.getElementById('bufferingChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: ['0h', '4h', '8h', '12h', '16h', '20h', '24h'],
+                        datasets: [
+                            {
+                                label: '일반 쓰기 (msec)',
+                                data: [40, 50, 100, 170, 110, 55, 40],
+                                borderColor: 'rgb(239, 68, 68)',
+                                backgroundColor: 'rgba(239, 68, 68, 0.1)',
+                                tension: 0.3,
+                                fill: true,
+                            },
+                            {
+                                label: '버퍼링 쓰기 (msec)',
+                                data: [38, 42, 60, 70, 65, 45, 39],
+                                borderColor: 'rgb(34, 197, 94)',
+                                backgroundColor: 'rgba(34, 197, 94, 0.1)',
+                                tension: 0.3,
+                                fill: true,
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                         scales: { y: { beginAtZero: true } },
+                         plugins: {
+                            tooltip: { mode: 'index', intersect: false },
+                        },
+                    }
+                });
+            };
+            
+            const createLoadBalancingChart = () => {
+                const ctx = document.getElementById('loadBalancingChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Strategy 1', 'Strategy 2', 'Strategy 3'],
+                        datasets: [{
+                            label: '효율성 (평균 부하 / 최대 부하)',
+                            data: [0.78, 0.55, 0.99],
+                            backgroundColor: [
+                                'rgba(251, 146, 60, 0.6)',
+                                'rgba(239, 68, 68, 0.6)',
+                                'rgba(56, 189, 248, 0.6)'
+                            ],
+                            borderColor: [
+                                'rgb(251, 146, 60)',
+                                'rgb(239, 68, 68)',
+                                'rgb(56, 189, 248)'
+                            ],
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        indexAxis: 'y',
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { x: { beginAtZero: true, max: 1 } },
+                        plugins: { legend: { display: false } }
+                    }
+                });
+            };
+
+            const createDivergenceChart = () => {
+                const ctx = document.getElementById('divergenceChart').getContext('2d');
+                new Chart(ctx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['1개 버전 (정상)', '2개 버전', '3개 버전', '4개 버전'],
+                        datasets: [{
+                            data: [99.94, 0.00057, 0.00047, 0.00009],
+                            backgroundColor: ['#10b981', '#f97316', '#f59e0b', '#ef4444'],
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                    }
+                });
+            };
+            
+            createLatencyChart();
+            createBufferingChart();
+            createLoadBalancingChart();
+            createDivergenceChart();
+
+
+            // Simulator Logic
+            const n = 3; // N value is fixed at 3
+            let currentR = 2; // Default R value
+            let currentW = 2; // Default W value
+
+            const rValueSpan = document.getElementById('r_value');
+            const wValueSpan = document.getElementById('w_value');
+
+            const rDecrementBtn = document.getElementById('r_decrement');
+            const rIncrementBtn = document.getElementById('r_increment');
+            const wDecrementBtn = document.getElementById('w_decrement');
+            const wIncrementBtn = document.getElementById('w_increment');
+
+            const quorumStatus = document.getElementById('quorum-status');
+            const readAvailability = document.getElementById('read-availability');
+            const writeAvailability = document.getElementById('write-availability');
+            const consistency = document.getElementById('consistency');
+            const simulatorDesc = document.getElementById('simulator-desc');
+
+            const R_MIN = 1;
+            const R_MAX = 2; // R max fixed to 2
+            const W_MIN = 1;
+            const W_MAX = 2; // W max fixed to 2
+
+            function updateSimulator() {
+                rValueSpan.textContent = currentR;
+                wValueSpan.textContent = currentW;
+
+                const ratings = {
+                    low: '낮음', med: '중간', high: '높음', vhigh: '매우 높음',
+                    colors: { low: 'text-red-500', med: 'text-amber-500', high: 'text-sky-500', vhigh: 'text-green-500' }
+                };
+
+                // Read Availability/Performance
+                let readAvail, readColor;
+                if(currentR === 1) { readAvail = ratings.vhigh; readColor = ratings.colors.vhigh; }
+                else if (currentR <= n / 2) { readAvail = ratings.high; readColor = ratings.colors.high; } // n/2 = 1.5, R=1
+                else { readAvail = ratings.med; readColor = ratings.colors.med; } // R=2
+                readAvailability.textContent = readAvail;
+                readAvailability.className = `text-2xl font-bold ${readColor}`;
+
+
+                // Write Availability/Performance
+                let writeAvail, writeColor;
+                if(currentW === 1) { writeAvail = ratings.vhigh; writeColor = ratings.colors.vhigh; }
+                else if (currentW <= n / 2) { writeAvail = ratings.high; writeColor = ratings.colors.high; } // n/2 = 1.5, W=1
+                else { writeAvail = ratings.med; writeColor = ratings.colors.med; } // W=2
+                writeAvailability.textContent = writeAvail;
+                writeAvailability.className = `text-2xl font-bold ${writeColor}`;
+
+                // Consistency/Durability
+                let constLevel, constColor;
+                if (currentR + currentW > n) { // If R+W > 3 (e.g., 2+2=4)
+                    if (currentW > n/2) {constLevel = ratings.vhigh; constColor = ratings.colors.vhigh; } // If W > 1.5 (e.g., W=2)
+                    else { constLevel = ratings.high; constColor = ratings.colors.high; }
+                } else { // If R+W <= 3 (e.g., 1+1=2, 1+2=3, 2+1=3)
+                    if (currentR === 1 && currentW === 1) { // Only (1,1) is low
+                        constLevel = ratings.low; constColor = ratings.colors.low;
+                    } else { // (1,2) or (2,1) will be medium
+                        constLevel = ratings.med; constColor = ratings.colors.med;
+                    }
+                }
+                consistency.textContent = constLevel;
+                consistency.className = `text-2xl font-bold ${constColor}`;
+                
+                // Quorum Status & Description
+                if (currentR + currentW > n) {
+                    quorumStatus.textContent = `강한 일관성 (R=${currentR} + W=${currentW} = ${currentR + currentW} > N=${n})`;
+                    quorumStatus.className = 'mb-4 p-3 rounded-md text-center font-semibold bg-green-100 text-green-800';
+                    simulatorDesc.textContent = `읽기(${currentR})와 쓰기(${currentW})에 필요한 노드 합이 전체 복제본 수(${n})보다 커서, 항상 최신 데이터를 읽는 것이 보장됩니다. 높은 일관성과 데이터 내구성을 제공하지만, 응답을 기다려야 하는 노드 수가 많아져 지연 시간이 늘어날 수 있습니다.`;
+                } else {
+                    quorumStatus.textContent = `최종 일관성 (R=${currentR} + W=${currentW} = ${currentR + currentW} <= N=${n})`;
+                    quorumStatus.className = 'mb-4 p-3 rounded-md text-center font-semibold bg-amber-100 text-amber-800';
+                    simulatorDesc.textContent = `읽기와 쓰기 쿼럼의 합이 전체 복제본 수보다 작거나 같아, 일시적으로 예전 데이터를 읽을 수 있습니다. 대신 적은 수의 노드만 응답해도 작업이 성공하므로, 장애 상황에서도 높은 가용성과 빠른 응답 속도를 얻을 수 있습니다.`;
+                }
+            }
+
+            // R button handlers
+            rDecrementBtn.addEventListener('click', () => {
+                if (currentR > R_MIN) {
+                    currentR--;
+                    updateSimulator();
+                }
+            });
+            rIncrementBtn.addEventListener('click', () => {
+                if (currentR < R_MAX) {
+                    currentR++;
+                    updateSimulator();
+                }
+            });
+
+            // W button handlers
+            wDecrementBtn.addEventListener('click', () => {
+                if (currentW > W_MIN) {
+                    currentW--;
+                    updateSimulator();
+                }
+            });
+            wIncrementBtn.addEventListener('click', () => {
+                if (currentW < W_MAX) {
+                    currentW++;
+                    updateSimulator();
+                }
+            });
+
+            // Initial update
+            updateSimulator();
+        });
+    </script>
+</body>
+</html>
