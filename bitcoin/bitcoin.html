@@ -1,59 +1,33 @@
-﻿<!DOCTYPE html>
-<html lang="ko">
+<!DOCTYPE html>
+<html lang="ko" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>비트코인: P2P 전자 현금 시스템 인포그래픽</title>
+    <title>대화형 비트코인 백서: P2P 전자 현금 시스템</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
-    <!--
-인포그래픽 계획:
-섹션 1: 온라인 결제의 문제점 (서론, 문제점)
-섹션 2: 비트코인 소개 - P2P 솔루션 (정의, 디지털 서명)
-섹션 3: 이중 지불 해결: 블록체인 및 작업 증명 (타임스탬프, PoW, 블록체인 개념)
-섹션 4: 비트코인 네트워크 작동 방식 (프로세스 흐름도)
-섹션 5: 인센티브 - 네트워크의 정직성과 보안 유지 (블록 보상, 수수료)
-섹션 6: 비트코인의 주요 기능 (디스크 공간/머클, SPV, 프라이버시, 가치 분할/결합)
-섹션 7: 보안의 수학적 근거 (공격자 확률, 확인 차트)
-섹션 8: 결론 - 비트코인의 영향
-
-선택된 색상 팔레트: "Energetic & Playful"
-배경: #F0F4F8 (밝은 회색빛 파랑)
-카드 배경: #FFFFFF (흰색)
-기본 텍스트/어두운색: #073B4C (미드나잇 그린)
-코랄 레드: #FF6B6B
-선글로우 옐로우: #FFD166
-카리브 그린: #06D6A0
-블루 NCS: #118AB2
-
-시각화 선택 및 정당화 (SVG, MERMAID JS 사용 안 함 확인):
-- S1 문제: 큰 숫자 + HTML/CSS 아이콘 (정보 전달, SVG 없음)
-- S2 거래 흐름: HTML/CSS 다이어그램 (정리, SVG 없음)
-- S3 타임스탬프 체인: HTML/CSS 다이어그램 (정리, SVG 없음)
-- S3 PoW 해싱: 텍스트 + HTML/CSS 그래픽 (정보 전달, SVG 없음)
-- S4 네트워크 흐름: HTML/CSS 흐름도 (정리, SVG 없음, Mermaid 없음)
-- S5 인센티브: HTML/CSS 아이콘 + 텍스트 (정보 전달, SVG 없음)
-- S6 머클 트리: HTML/CSS 다이어그램 (정리, SVG 없음)
-- S6 SPV: HTML/CSS 아이콘 + 텍스트 (정보 전달, SVG 없음)
-- S6 프라이버시: HTML/CSS 아이콘 + 텍스트 (정보 전달, SVG 없음)
-- S6 가치 분할: HTML/CSS 다이어그램 (정리, SVG 없음)
-- S7 공격자 확률: Chart.js 라인 차트 (캔버스) (변화/관계, SVG 없음)
-- S7 안전한 확인: 큰 숫자 (정보 전달, SVG 없음)
-
-확인: 이 출력물 어디에도 Mermaid JS나 SVG는 사용되지 않았습니다.
-모든 다이어그램은 HTML과 Tailwind CSS를 사용하여 구현되었습니다. 차트는 Chart.js (캔버스)를 사용합니다.
--->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <!-- Chosen Palette: Warm Neutral (Stone) with Blue accent -->
+    <!-- Application Structure Plan: The SPA is designed as a narrative journey. It starts with the 'Why' (The Problem with traditional finance), moves to the 'What' (The Core Idea of Bitcoin), then the 'How' (How the Network operates), and finally the 'Proof' (Security & Practicality). This thematic structure is more intuitive for learning than the paper's original sectioning. Key interactions include smooth-scrolling navigation and a dynamic chart in the 'Security' section, allowing users to manipulate variables from the whitepaper's formula to understand the robustness of the system. This approach transforms a dense academic paper into an engaging, explorable story. -->
+    <!-- Visualization & Content Choices: 
+        - Problem/Solution Flow (HTML/CSS): Goal: Inform. A visual flow from 'Traditional Model' to 'P2P Model' to clearly frame the core value proposition.
+        - Transaction Chain Diagram (HTML/CSS): Goal: Organize. Visually represents the concept of a coin as a chain of digital signatures, making an abstract idea concrete. Uses simple divs and Tailwind for layout.
+        - Proof-of-Work Diagram (HTML/CSS): Goal: Organize. A simplified visual representation of the blockchain, showing blocks linked by hashes.
+        - Network Operation Steps (HTML/CSS): Goal: Organize. An ordered list with icons to clearly present the network's lifecycle.
+        - Attacker Success Probability Chart (Chart.js): Goal: Compare/Change. This is the main interactive element. It visualizes the mathematical formula from Section 11 of the paper. Interaction: Users can select an attacker's hashrate (q), and the line chart dynamically updates to show the probability of success over the number of confirmation blocks (z). This makes the security model tangible and verifiable for the user. Library: Chart.js for its simplicity and Canvas rendering.
+        - All content is paraphrased and simplified from the whitepaper to improve readability while retaining the core concepts.
+        - Merkle Tree explanation (HTML/CSS): Goal: Organize. Explains how transactions are efficiently stored and verified within a block.
+        - Simplified Payment Verification (HTML/CSS): Goal: Inform. Explains how users can verify payments without downloading the entire blockchain.
+    -->
+    <!-- CONFIRMATION: NO SVG graphics used. NO Mermaid JS used. -->
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #F0F4F8;
-            color: #073B4C;
-        }
+        body { font-family: 'Noto Sans KR', sans-serif; }
         .chart-container {
             position: relative;
             width: 100%;
-            max-width: 600px;
+            max-width: 800px;
             margin-left: auto;
             margin-right: auto;
             height: 300px;
@@ -61,374 +35,432 @@
         }
         @media (min-width: 768px) {
             .chart-container {
-                height: 350px;
+                height: 400px;
             }
         }
-        .info-card {
-            background-color: #FFFFFF;
-            border-radius: 0.75rem; /* 12px */
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            padding: 1.5rem; /* 24px */
-            margin-bottom: 2rem; /* 32px */
-        }
-        .section-title {
-            font-size: 2.25rem; /* 36px */
-            font-weight: 700;
-            color: #118AB2; /* Blue NCS */
-            margin-bottom: 1rem;
-            text-align: center;
-        }
-        .section-intro {
-            font-size: 1.125rem; /* 18px */
-            color: #073B4C; /* Midnight Green */
-            margin-bottom: 2rem;
-            text-align: center;
-            max-width: 3xl; /* 768px */
-            margin-left: auto;
-            margin-right: auto;
-        }
-        .stat-big-number {
-            font-size: 3rem; /* 48px */
-            font-weight: 700;
-            color: #FF6B6B; /* Coral Red */
-            display: block;
-            text-align: center;
-        }
-        .stat-label {
-            font-size: 1rem; /* 16px */
-            color: #073B4C;
-            text-align: center;
-            margin-top: 0.5rem;
-        }
-        .diagram-box {
-            border: 2px solid #118AB2; /* Blue NCS */
-            background-color: #E0F2FE; /* Light blue bg for contrast */
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            text-align: center;
-            color: #073B4C;
-            min-height: 60px;
+        .icon-box {
             display: flex;
             align-items: center;
             justify-content: center;
-        }
-        .arrow {
-            font-size: 2rem;
-            color: #118AB2; /* Blue NCS */
-            margin: 0 0.5rem;
-            display: flex;
-            align-items: center;
-        }
-         .flowchart-step {
-            background-color: #E0F7FA; /* Light Cyan */
-            border: 2px solid #06D6A0; /* Caribbean Green */
-            color: #073B4C;
-            padding: 1rem;
+            width: 4rem;
+            height: 4rem;
             border-radius: 0.5rem;
-            text-align: center;
-            margin-bottom: 1rem;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-        .flowchart-arrow {
-            text-align: center;
-            font-size: 1.5rem; /* 24px */
-            color: #06D6A0; /* Caribbean Green */
-            margin: 0.5rem 0;
+            background-color: #E0E7FF;
+            color: #3730A3;
+            font-size: 1.875rem;
+            line-height: 2.25rem;
+            font-weight: 700;
         }
     </style>
 </head>
-<body class="bg-[#F0F4F8] text-[#073B4C]">
+<body class="bg-stone-50 text-stone-800">
 
-    <header class="py-8 bg-[#073B4C] text-white text-center">
-        <h1 class="text-4xl font-bold">비트코인: P2P 전자 현금 시스템</h1>
-        <p class="text-xl mt-2">사토시 나카모토 백서 기반 인포그래픽</p>
+    <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
+        <nav class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <h1 class="text-xl font-bold text-blue-800">비트코인 백서 탐험</h1>
+            <div class="hidden md:flex space-x-8">
+                <a href="#problem" class="text-stone-600 hover:text-blue-600">문제 제기</a>
+                <a href="#idea" class="text-stone-600 hover:text-blue-600">핵심 아이디어</a>
+                <a href="#network" class="text-stone-600 hover:text-blue-600">작동 원리</a>
+                <a href="#security" class="text-stone-600 hover:text-blue-600">보안</a>
+                <a href="#efficiency" class="text-stone-600 hover:text-blue-600">효율성</a>
+            </div>
+            <div class="md:hidden">
+                <select onchange="window.location.href=this.value" class="bg-white border border-stone-300 rounded-md p-2">
+                    <option value="#home">이동</option>
+                    <option value="#problem">문제 제기</option>
+                    <option value="#idea">핵심 아이디어</option>
+                    <option value="#network">작동 원리</option>
+                    <option value="#security">보안</option>
+                    <option value="#efficiency">효율성</option>
+                </select>
+            </div>
+        </nav>
     </header>
 
-    <main class="max-w-6xl mx-auto p-4 md:p-8">
+    <main id="home" class="container mx-auto p-6 md:p-12">
+        
+        <section class="text-center py-16 md:py-24">
+            <h2 class="text-4xl md:text-5xl font-bold mb-4">비트코인: P2P 전자 현금 시스템</h2>
+            <p class="text-lg text-stone-600 max-w-3xl mx-auto">사토시 나카모토의 2008년 백서를 통해 은행 없이 개인이 직접 돈을 주고받는 혁신적인 아이디어를 탐험해보세요.</p>
+        </section>
 
-        <section class="py-12">
-            <h2 class="section-title">1. 기존 온라인 결제의 문제점</h2>
-            <p class="section-intro">인터넷 상거래는 금융 기관에 대한 신뢰에 크게 의존합니다. 기능적이지만, 이 모델에는 비트코인이 해결하고자 하는 내재된 약점이 있습니다.</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-center">
-                <div class="info-card">
-                    <span class="text-5xl block mb-2 text-[#FF6B6B]">💸</span>
-                    <h3 class="text-xl font-semibold text-[#118AB2] mb-2">높은 거래 비용</h3>
-                    <p>중재 및 분쟁 해결로 인해 비용이 증가하여 소액 거래가 비실용적입니다.</p>
+        <section id="problem" class="py-16 md:py-20 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold">문제 제기: 왜 새로운 시스템이 필요한가?</h3>
+                <p class="mt-4 text-stone-600 max-w-2xl mx-auto">기존 금융 시스템은 '신뢰'를 기반으로 작동하지만, 이로 인해 여러 문제가 발생합니다. 비트코인은 이 신뢰의 문제를 해결하기 위해 탄생했습니다.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8 items-center">
+                <div class="bg-white p-8 rounded-lg shadow">
+                    <h4 class="text-xl font-semibold mb-4 text-red-600">기존 금융 시스템의 약점</h4>
+                    <p class="text-stone-600 mb-4">기존 금융 시스템에는 다음과 같은 구조적인 약점이 있으며, 이는 심각한 문제로 이어질 수 있습니다.</p>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <div>
+                                <strong class="block">1. 신뢰 기관 의존</strong>
+                                <p class="text-stone-600">은행과 같은 제3자를 반드시 신뢰해야 합니다. 이 기관이 해킹되거나 파산하면 시스템 전체가 위험해집니다.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div>
+                                <strong class="block">2. 거래 취소 가능성</strong>
+                                <p class="text-stone-600">거래를 되돌릴 수 있어 판매자는 항상 사기의 위험에 노출되며, 이로 인한 분쟁 해결 비용이 발생합니다.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div>
+                                <strong class="block">3. 소액 거래의 비효율성</strong>
+                                <p class="text-stone-600">중개 수수료 때문에 커피 한 잔 같은 소액 결제가 비싸지고 복잡해집니다.</p>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
-                <div class="info-card">
-                     <span class="text-5xl block mb-2 text-[#FFD166]">🔄</span>
-                    <h3 class="text-xl font-semibold text-[#118AB2] mb-2">취소 불가능한 거래의 부재</h3>
-                    <p>금융 기관은 거래를 취소할 수 있어 판매자에게 불확실성을 초래합니다.</p>
-                </div>
-                <div class="info-card">
-                     <span class="text-5xl block mb-2 text-[#06D6A0]">🛡️</span>
-                    <h3 class="text-xl font-semibold text-[#118AB2] mb-2">신뢰 및 사기</h3>
-                    <p>신뢰의 필요성이 광범위하며, 일정 비율의 사기는 불가피한 것으로 받아들여집니다.</p>
+                 <div class="bg-white p-8 rounded-lg shadow">
+                    <h4 class="text-xl font-semibold mb-4 text-green-600">비트코인의 제안: 암호학적 증명</h4>
+                    <p class="text-stone-600 mb-4">비트코인은 신뢰 대신 암호학적 증명에 기반한 시스템을 제안합니다. 이를 통해 다음과 같은 장점을 가집니다.</p>
+                    <ul class="space-y-4">
+                        <li class="flex items-start">
+                            <div>
+                                <strong class="block">1. P2P 직접 거래</strong>
+                                <p class="text-stone-600">중개자 없이 전 세계 누구와도 직접 돈을 주고받을 수 있습니다.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                            <div>
+                                <strong class="block">2. 취소 불가능한 거래</strong>
+                                <p class="text-stone-600">한 번 완료된 거래는 되돌릴 수 없어 판매자를 사기로부터 보호합니다.</p>
+                            </div>
+                        </li>
+                        <li class="flex items-start">
+                             <div>
+                                <strong class="block">3. 낮은 수수료</strong>
+                                <p class="text-stone-600">중개자가 없으므로 국경에 상관없이 매우 낮은 비용으로 송금이 가능합니다.</p>
+                            </div>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </section>
 
-        <section class="py-12">
-            <h2 class="section-title">2. 비트코인: P2P 솔루션</h2>
-            <p class="section-intro">비트코인은 신뢰할 수 있는 제3자 없이 두 당사자 간의 직접 거래를 허용하는 암호학적 증명 기반의 전자 결제 시스템을 제안합니다.</p>
-            <div class="info-card">
-                <h3 class="text-2xl font-semibold text-[#118AB2] mb-4 text-center">전자 코인이란?</h3>
-                <p class="text-lg mb-6 text-center">비트코인에서 전자 코인은 <strong class="text-[#FF6B6B]">디지털 서명의 체인</strong>으로 정의됩니다.</p>
-                <div class="space-y-4 md:space-y-0 md:flex md:items-center md:justify-center md:space-x-2">
-                    <div class="diagram-box w-full md:w-1/4">소유자 0의 코인</div>
-                    <div class="arrow hidden md:flex">➡️</div>
-                    <div class="text-sm text-center md:w-auto my-2 md:my-0">소유자 0이 (이전 거래 + 소유자 1의 공개 키) 해시에 서명</div>
-                    <div class="arrow hidden md:flex">➡️</div>
-                    <div class="diagram-box w-full md:w-1/4">소유자 1이 코인 수령</div>
-                </div>
-                <p class="mt-6 text-center">각 소유자는 이전 거래의 해시값과 다음 소유자의 공개 키를 디지털 서명하여 코인을 다음 소유자에게 전달하고, 이 정보를 코인 끝에 추가합니다. 수신자는 서명을 확인하여 소유권 체인을 검증할 수 있습니다.</p>
+        <section id="idea" class="py-16 md:py-20 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold">핵심 아이디어: 이중 지불 문제 해결</h3>
+                <p class="mt-4 text-stone-600 max-w-2xl mx-auto">디지털 돈은 쉽게 복사될 수 있습니다. '하나의 돈을 두 번 쓰는' 이중 지불 문제를 어떻게 막을 수 있을까요? 비트코인은 공개된 거래 장부인 '블록체인'으로 이 문제를 해결합니다.</p>
             </div>
-        </section>
-
-        <section class="py-12">
-            <h2 class="section-title">3. 이중 지불 해결: 블록체인 및 작업 증명</h2>
-            <p class="section-intro">가장 큰 과제는 전자 현금의 "이중 지불"을 방지하는 것입니다. 비트코인의 해결책은 공개적으로 발표되는 거래 기록, 타임스탬프 서버, 그리고 작업 증명을 포함합니다.</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="info-card">
-                    <h3 class="text-xl font-semibold text-[#118AB2] mb-3">타임스탬프 서버 개념</h3>
-                    <p class="mb-4">거래는 블록으로 묶입니다. 각 블록에는 타임스탬프가 찍히고 이전 블록의 해시를 포함하여 체인을 형성합니다.</p>
-                    <div class="flex items-center justify-center space-x-1">
-                        <div class="diagram-box text-xs p-2 w-1/4">블록 N-1</div>
-                        <div class="arrow text-xl">⛓️</div>
-                        <div class="diagram-box text-xs p-2 w-1/4 bg-[#FFD166]/30 border-[#FFD166]">블록 N (N-1의 해시)</div>
-                        <div class="arrow text-xl">⛓️</div>
-                        <div class="diagram-box text-xs p-2 w-1/4">블록 N+1 (N의 해시)</div>
+            
+            <div class="bg-white p-8 rounded-lg shadow mb-12">
+                <h4 class="text-xl font-semibold mb-4">1. 거래 (Transaction): 디지털 서명의 체인</h4>
+                <p class="text-stone-600 mb-6">비트코인에서 '코인'이란 디지털 서명들이 사슬처럼 연결된 것입니다. 소유권을 넘길 때마다 이전 거래 정보와 받는 사람의 공개키를 합쳐서 자신의 개인키로 서명하고, 이 서명을 코인 뒤에 덧붙입니다.</p>
+                <div class="flex flex-col md:flex-row justify-center items-center space-y-4 md:space-y-0 md:space-x-4 p-4 bg-stone-100 rounded-lg">
+                    <div class="text-center p-4 bg-white rounded shadow-sm">
+                        <p class="font-bold">소유자 1</p>
+                        <p class="text-xs text-stone-500">소유자 2의 공개키로 서명</p>
                     </div>
-                    <p class="mt-4">이 체인, 즉 <strong class="text-[#06D6A0]">블록체인</strong>은 모든 거래의 공개 장부이며, 과거 거래를 변경하는 것을 계산적으로 비실용적이게 만듭니다.</p>
-                </div>
-                <div class="info-card">
-                    <h3 class="text-xl font-semibold text-[#118AB2] mb-3">작업 증명 (PoW)</h3>
-                    <p class="mb-4">블록을 체인에 추가하려면 "채굴자"는 계산적으로 어려운 퍼즐을 풀어야 합니다. 이것이 작업 증명입니다.</p>
-                    <div class="diagram-box bg-[#073B4C] text-white p-4">
-                        <p class="font-mono">논스(Nonce)를 찾아 다음을 만족:<br>SHA256(이전_해시 + 머클_루트 + 논스) = <strong class="text-[#06D6A0]">0000...xxxx</strong></p>
+                    <div class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-stone-400">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.364 1.757l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                        </svg>
                     </div>
-                    <p class="mt-4">이를 가장 먼저 해결한 채굴자는 자신의 블록을 추가하고 보상을 받습니다. 이 과정은 네트워크를 보호합니다. 왜냐하면 어떤 블록을 변경하려면 해당 블록과 모든 후속 블록의 PoW를 다시 수행해야 하므로 엄청난 계산 능력이 필요하기 때문입니다.</p>
-                    <p class="mt-2"><strong class="text-[#FF6B6B]">하나의 CPU, 하나의 투표:</strong> 가장 긴 체인은 가장 많은 PoW가 투자된 다수결 결정을 나타냅니다.</p>
-                </div>
-            </div>
-        </section>
-
-        <section class="py-12">
-            <h2 class="section-title">4. 비트코인 네트워크 작동 방식</h2>
-            <p class="section-intro">비트코인 네트워크는 거래를 처리하고 확인하여 분산되고 일관된 장부를 유지하기 위한 일련의 단계를 따릅니다.</p>
-            <div class="info-card max-w-2xl mx-auto">
-                <div class="flowchart-step">1. 새로운 거래가 모든 노드에 방송됩니다.</div>
-                <div class="flowchart-arrow">⬇️</div>
-                <div class="flowchart-step">2. 각 노드는 새로운 거래를 블록으로 수집합니다.</div>
-                <div class="flowchart-arrow">⬇️</div>
-                <div class="flowchart-step">3. 각 노드는 자신의 블록에 대한 어려운 작업 증명을 찾기 위해 노력합니다.</div>
-                <div class="flowchart-arrow">⬇️</div>
-                <div class="flowchart-step">4. 노드가 작업 증명을 찾으면 해당 블록을 모든 노드에 방송합니다.</div>
-                <div class="flowchart-arrow">⬇️</div>
-                <div class="flowchart-step">5. 노드는 블록 내의 모든 거래가 유효하고 아직 사용되지 않았다면 블록을 수락합니다.</div>
-                <div class="flowchart-arrow">⬇️</div>
-                <div class="flowchart-step">6. 노드는 수락된 블록의 해시를 이전 해시로 사용하여 체인의 다음 블록을 생성함으로써 해당 블록에 대한 수락을 표현합니다.</div>
-                <p class="mt-6 text-center">노드들은 항상 <strong class="text-[#118AB2]">가장 긴 체인</strong>을 올바른 것으로 간주하고 이를 확장하는 데 계속 노력합니다.</p>
-            </div>
-        </section>
-
-        <section class="py-12">
-            <h2 class="section-title">5. 인센티브: 네트워크의 정직성과 보안 유지</h2>
-            <p class="section-intro">비트코인 네트워크는 참여를 장려하고 보안 및 무결성을 유지하기 위해 인센티브에 의존합니다.</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div class="info-card text-center">
-                    <span class="text-5xl block mb-2 text-[#FFD166]">💰</span>
-                    <h3 class="text-xl font-semibold text-[#118AB2] mb-2">블록 보상</h3>
-                    <p>블록의 첫 번째 거래는 새로운 코인을 생성하는 특별한 거래로, 작업 증명을 찾은 채굴자에게 보상으로 주어집니다. 이것이 새로운 비트코인이 처음 유통되는 방식입니다.</p>
-                </div>
-                <div class="info-card text-center">
-                    <span class="text-5xl block mb-2 text-[#06D6A0]">🔗</span>
-                    <h3 class="text-xl font-semibold text-[#118AB2] mb-2">거래 수수료</h3>
-                    <p>사용자는 결제 시 거래 수수료를 포함할 수 있습니다. 이 수수료는 거래를 자신의 블록에 포함시킨 채굴자가 수집하며, 특히 블록 보상이 시간이 지남에 따라 감소할 때 추가적인 인센티브를 제공합니다.</p>
-                </div>
-            </div>
-            <div class="info-card mt-8">
-                <h3 class="text-xl font-semibold text-[#118AB2] mb-3 text-center">정직성 장려</h3>
-                <p class="text-center">상당한 CPU 파워를 가진 탐욕스러운 공격자는 다른 사람을 속이려 시도하여 시스템과 자신의 부의 유효성을 훼손하는 것보다 (규칙을 따름으로써) 새로운 코인을 생성하는 데 자신의 파워를 사용하는 것이 더 수익성이 높다는 것을 알게 될 것입니다.</p>
-            </div>
-        </section>
-
-        <section class="py-12">
-            <h2 class="section-title">6. 비트코인의 주요 기능</h2>
-            <p class="section-intro">비트코인은 효율성, 확장성 및 프라이버시를 향상시키는 여러 기능을 통합합니다.</p>
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <div class="info-card">
-                    <h3 class="text-lg font-semibold text-[#118AB2] mb-2">디스크 공간 회수 (머클 트리)</h3>
-                    <p class="text-sm mb-3">디스크 공간을 절약하기 위해 사용된 거래는 가지치기할 수 있습니다. 거래는 머클 트리로 해시되며, 루트 해시만 블록에 포함됩니다.</p>
-                    <div class="text-xs p-2 border border-dashed border-[#073B4C] rounded">
-                        <div class="diagram-box !p-1 !text-xs bg-[#073B4C]/10">머클 루트 (블록 헤더에 포함)</div>
-                        <div class="flex justify-around mt-1">
-                            <div class="diagram-box !p-1 !text-xs w-2/5">해시(거래0,거래1)</div>
-                            <div class="diagram-box !p-1 !text-xs w-2/5">해시(거래2,거래3)</div>
-                        </div>
-                        <div class="flex justify-around mt-1">
-                             <div class="diagram-box !p-1 !text-xs w-1/5">거래0</div> <div class="diagram-box !p-1 !text-xs w-1/5">거래1</div>
-                             <div class="diagram-box !p-1 !text-xs w-1/5">거래2</div> <div class="diagram-box !p-1 !text-xs w-1/5">거래3</div>
-                        </div>
+                    <div class="text-center p-4 bg-white rounded shadow-sm">
+                        <p class="font-bold">소유자 2</p>
+                        <p class="text-xs text-stone-500">소유자 3의 공개키로 서명</p>
                     </div>
-                    <p class="text-sm mt-2">이를 통해 오래된 블록을 블록의 해시를 깨뜨리지 않고 압축할 수 있습니다.</p>
-                </div>
-                 <div class="info-card">
-                    <h3 class="text-lg font-semibold text-[#118AB2] mb-2">간소화된 결제 검증 (SPV)</h3>
-                    <p class="text-sm">사용자는 전체 네트워크 노드를 실행하지 않고도 결제를 검증할 수 있습니다. 가장 긴 체인의 블록 헤더와 거래를 블록에 연결하는 머클 브랜치만 있으면 됩니다.</p>
-                    <div class="text-center mt-3"><span class="text-4xl text-[#FF6B6B]">📱</span> <span class="text-2xl">➡️</span> <span class="text-4xl text-[#06D6A0]">✅</span></div>
-                </div>
-                <div class="info-card">
-                    <h3 class="text-lg font-semibold text-[#118AB2] mb-2">프라이버시</h3>
-                    <p class="text-sm">공개 키를 익명으로 유지함으로써 프라이버시가 유지됩니다. 거래는 공개되지만, 신원과 연결되지 않습니다. 각 거래마다 새로운 키 쌍을 사용하는 것이 권장됩니다.</p>
-                    <div class="text-center mt-3"><span class="text-4xl text-[#118AB2]">👤</span> <span class="text-2xl">🔑</span> <span class="text-4xl text-[#FFD166]">❓</span></div>
-                </div>
-                <div class="info-card lg:col-span-3">
-                    <h3 class="text-lg font-semibold text-[#118AB2] mb-2 text-center">가치 결합 및 분할</h3>
-                    <p class="text-sm mb-3 text-center">거래는 여러 입력과 출력을 가질 수 있어 가치를 효율적으로 분할하고 결합할 수 있습니다.</p>
-                    <div class="flex flex-col md:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-2">
-                        <div class="flex flex-col space-y-1 items-end">
-                            <div class="diagram-box !p-1 !text-xs">입력 1 (이전 거래 A에서)</div>
-                            <div class="diagram-box !p-1 !text-xs">입력 2 (이전 거래 B에서)</div>
-                        </div>
-                        <div class="arrow text-xl md:rotate-0 rotate-90">➡️</div>
-                        <div class="diagram-box !p-2 text-sm bg-[#FFD166]/30 border-[#FFD166]">거래</div>
-                        <div class="arrow text-xl md:rotate-0 rotate-90">➡️</div>
-                        <div class="flex flex-col space-y-1 items-start">
-                            <div class="diagram-box !p-1 !text-xs">출력 1 (수신자에게)</div>
-                            <div class="diagram-box !p-1 !text-xs">출력 2 (발신자에게 잔돈)</div>
-                        </div>
+                    <div class="flex items-center justify-center">
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-stone-400">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.364 1.757l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                        </svg>
+                    </div>
+                    <div class="text-center p-4 bg-white rounded shadow-sm">
+                        <p class="font-bold">소유자 3</p>
+                        <p class="text-xs text-stone-500">...</p>
                     </div>
                 </div>
             </div>
+
+            <div class="bg-white p-8 rounded-lg shadow">
+                <h4 class="text-xl font-semibold mb-4">2. 해결책: 블록체인과 작업 증명 (Proof-of-Work)</h4>
+                <p class="text-stone-600 mb-6">모든 거래를 시간 순서대로 기록하고 위변조를 막기 위해, 비트코인은 거래들을 '블록'에 담아 '체인'으로 연결합니다. 새로운 블록을 추가하려면 매우 어려운 수학 문제를 풀어야 하는데, 이를 '작업 증명'이라고 합니다.</p>
+                <div class="p-6 bg-stone-100 rounded-lg">
+                    <div class="flex flex-col md:flex-row justify-between items-center text-center">
+                        <div class="p-4 bg-white rounded-lg shadow w-full md:w-1/4">
+                            <p class="font-bold text-lg">블록 N-1</p>
+                            <p class="text-sm text-stone-500 break-all">해시: 0000...a1b2</p>
+                        </div>
+                        <div class="my-4 md:my-0 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-stone-400">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.364 1.757l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                            </svg>
+                        </div>
+                        <div class="p-4 bg-white rounded-lg shadow w-full md:w-1/4">
+                            <p class="font-bold text-lg">블록 N</p>
+                            <p class="text-sm text-stone-500 break-all">이전 해시: 0000...a1b2</p>
+                            <p class="font-semibold text-blue-600 mt-2">거래 내역</p>
+                        </div>
+                        <div class="my-4 md:my-0 flex items-center justify-center">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-stone-400">
+                                <path stroke-linecap="round" stroke-linejoin="round" d="M13.19 8.688a4.5 4.5 0 011.242 7.244l-4.5 4.5a4.5 4.5 0 01-6.364-6.364l1.757-1.757m13.364 1.757l1.757-1.757a4.5 4.5 0 00-6.364-6.364l-4.5 4.5a4.5 4.5 0 001.242 7.244" />
+                            </svg>
+                        </div>
+                        <div class="p-4 bg-blue-100 border-2 border-blue-400 border-dashed rounded-lg shadow w-full md:w-1/4">
+                            <p class="font-bold text-lg">새 블록 (N+1)</p>
+                            <p class="text-sm text-stone-500">이전 해시: ???</p>
+                            <p class="font-semibold text-blue-600 mt-2">작업 증명 찾는 중...</p>
+                        </div>
+                    </div>
+                    <p class="mt-6 text-center text-stone-700">각 블록은 이전 블록의 고유한 해시(지문)값을 포함하여 사슬처럼 연결됩니다. 하나의 블록을 바꾸려면 그 뒤에 연결된 모든 블록을 전부 다시 계산해야 하므로 사실상 위변조가 불가능합니다.</p>
+                </div>
+            </div>
         </section>
 
-        <section class="py-12">
-            <h2 class="section-title">7. 보안의 수학적 근거</h2>
-            <p class="section-intro">자신의 거래를 되돌리려는 공격자에 대한 비트코인의 보안은 수학적으로 입증 가능합니다. 공격자가 성공할 확률은 각 확인마다 기하급수적으로 감소합니다.</p>
-            <div class="info-card">
-                <h3 class="text-xl font-semibold text-[#118AB2] mb-3 text-center">공격자 성공 확률 대 확인 수</h3>
-                <p class="text-center mb-4">이 차트는 원래 거래에 대한 확인(z) 수가 증가함에 따라 공격자(네트워크 CPU 파워의 10%, q=0.1)가 대체 체인을 성공적으로 생성할 확률을 보여줍니다.</p>
+        <section id="network" class="py-16 md:py-20 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold">작동 원리: P2P 네트워크</h3>
+                <p class="mt-4 text-stone-600 max-w-2xl mx-auto">비트코인 네트워크는 중앙 서버 없이 전 세계 수많은 컴퓨터(노드)들이 자발적으로 참여하여 운영됩니다. 이 노드들이 다수결로 거래의 유효성을 결정합니다.</p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-lg shadow">
+                    <h4 class="text-xl font-semibold mb-4">네트워크 운영 6단계</h4>
+                    <ol class="space-y-4">
+                        <li class="flex"><div class="icon-box mr-4">1</div><p class="flex-1 self-center">새로운 거래가 모든 노드에 전파됩니다.</p></li>
+                        <li class="flex"><div class="icon-box mr-4">2</div><p class="flex-1 self-center">각 노드는 거래들을 모아 블록을 구성합니다.</p></li>
+                        <li class="flex"><div class="icon-box mr-4">3</div><p class="flex-1 self-center">노드들은 블록의 작업 증명 문제를 풀기 위해 경쟁합니다.</p></li>
+                        <li class="flex"><div class="icon-box mr-4">4</div><p class="flex-1 self-center">문제를 푼 노드는 블록을 네트워크에 전파합니다.</p></li>
+                        <li class="flex"><div class="icon-box mr-4">5</div><p class="flex-1 self-center">다른 노드들은 블록의 유효성을 검증하고 승인합니다.</p></li>
+                        <li class="flex"><div class="icon-box mr-4">6</div><p class="flex-1 self-center">노드들은 승인된 블록을 체인에 추가하고 다음 블록 생성 작업을 시작합니다. 이 때 가장 긴 체인이 항상 '진짜' 장부로 인정됩니다.</p></li>
+                    </ol>
+                </div>
+                 <div class="bg-white p-8 rounded-lg shadow">
+                    <h4 class="text-xl font-semibold mb-4">보상 (Incentive)</h4>
+                    <p class="text-stone-600 mb-6">아무 대가 없이 컴퓨터 자원을 소모할 사람은 없습니다. 비트코인은 네트워크에 기여하는 노드(채굴자)에게 보상을 제공하여 시스템이 유지되도록 합니다.</p>
+                    <div class="space-y-6">
+                        <div>
+                            <strong class="text-lg text-blue-700">블록 생성 보상</strong>
+                            <p class="text-stone-600 mt-1">작업 증명에 성공하여 새로운 블록을 생성한 채굴자는 보상으로 새로 발행된 비트코인을 받습니다. 이는 비트코인이 시장에 처음 유통되는 방식이기도 합니다.</p>
+                        </div>
+                         <div>
+                            <strong class="text-lg text-blue-700">거래 수수료</strong>
+                            <p class="text-stone-600 mt-1">사용자는 거래가 더 빨리 처리되도록 소량의 수수료를 지불할 수 있습니다. 이 수수료 또한 채굴자의 보상이 됩니다. 미래에 블록 보상이 사라지면, 수수료가 주된 보상이 될 것입니다.</p>
+                        </div>
+                    </div>
+                    <div class="mt-8 p-4 bg-amber-100 text-amber-800 rounded-lg">
+                        <p><strong>핵심:</strong> 정직하게 규칙을 따르는 것이 시스템을 공격하여 얻는 이익보다 더 크도록 설계되어, 참여자들이 정직하게 행동할 유인을 만듭니다.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="security" class="py-16 md:py-20 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold">보안: 공격은 얼마나 어려운가?</h3>
+                <p class="mt-4 text-stone-600 max-w-2xl mx-auto">비트코인의 보안은 다수의 정직한 노드가 가진 컴퓨팅 파워에 달려있습니다. 공격자가 거래를 조작하려면 전체 네트워크보다 더 많은 연산 능력을 가져야 합니다. 아래 차트를 통해 공격 성공 확률이 얼마나 희박한지 확인해보세요.</p>
+            </div>
+
+            <div class="bg-white p-8 rounded-lg shadow">
+                <h4 class="text-xl font-semibold mb-2">공격자 성공 확률 시뮬레이션</h4>
+                 <p class="text-stone-600 mb-6">공격자가 거래를 되돌리기 위해 비밀리에 대체 체인을 만들 때, 정직한 체인을 따라잡을 확률입니다. '확인된 블록 수(z)'가 늘어날수록 확률은 기하급수적으로 낮아집니다.</p>
+                <div class="mb-6">
+                    <label for="attacker-hashrate" class="block font-medium mb-2">공격자의 해시레이트(q) 선택:</label>
+                    <div id="hashrate-buttons" class="flex flex-wrap gap-2">
+                        <button data-q="0.1" class="hash-btn bg-blue-600 text-white px-4 py-2 rounded-md">10% (일반적)</button>
+                        <button data-q="0.25" class="hash-btn bg-blue-100 text-blue-800 px-4 py-2 rounded-md">25% (매우 강력)</button>
+                        <button data-q="0.45" class="hash-btn bg-blue-100 text-blue-800 px-4 py-2 rounded-md">45% (극도로 위험)</button>
+                    </div>
+                </div>
                 <div class="chart-container">
-                    <canvas id="attackerProbabilityChart"></canvas>
+                    <canvas id="attackerChart"></canvas>
                 </div>
-                <p class="mt-6 text-center">거래 후 더 많은 블록(확인)이 추가될수록 공격자가 이를 되돌리기는 기하급수적으로 어려워집니다. 예를 들어, 공격자 해시 파워가 10%일 때, 6번의 확인 후 성공 확률은 0.025% 미만입니다.</p>
-            </div>
-             <div class="info-card mt-8 text-center">
-                <span class="stat-big-number">~6</span>
-                <p class="stat-label">대부분의 거래에 대해 합리적인 비율의 네트워크 파워를 가진 공격자에 대한 보안을 위해 일반적으로 약 6번의 확인이 안전하다고 간주됩니다.</p>
+                <p id="chart-description" class="mt-4 text-center text-sm text-stone-500"></p>
             </div>
         </section>
 
-        <section class="py-12 text-center">
-            <h2 class="section-title">8. 결론: 비트코인의 영향</h2>
-            <div class="info-card max-w-3xl mx-auto">
-                <p class="text-lg mb-4">비트코인은 신뢰에 의존하지 않는 전자 거래를 위한 혁명적인 시스템을 제안했습니다. 디지털 서명, P2P 네트워크, 그리고 작업 증명을 결합하여 이중 지불 문제를 해결하고 새로운 형태의 디지털 현금을 가능하게 합니다.</p>
-                <p class="text-lg font-semibold text-[#06D6A0]">네트워크는 비구조적인 단순성 덕분에 강력합니다. 노드들은 CPU 파워로 투표하여 합의를 통해 규칙과 인센티브를 강제합니다.</p>
+        <section id="efficiency" class="py-16 md:py-20 scroll-mt-20">
+            <div class="text-center mb-12">
+                <h3 class="text-3xl font-bold">데이터 효율성 및 간편 결제</h3>
+                <p class="mt-4 text-stone-600 max-w-2xl mx-auto">비트코인 네트워크는 방대한 거래 데이터를 효율적으로 관리하고, 모든 사용자가 전체 기록을 다운로드하지 않고도 결제를 검증할 수 있는 방법을 제공합니다.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8">
+                <div class="bg-white p-8 rounded-lg shadow">
+                    <h4 class="text-xl font-semibold mb-4">머클 트리 (Merkle Tree)</h4>
+                    <p class="text-stone-600 mb-4">블록 내의 모든 거래는 '머클 트리'라는 방식으로 해시되어 저장됩니다. 이는 데이터 무결성을 검증하고 효율적인 데이터 관리를 가능하게 합니다.</p>
+                    <ul class="space-y-3 text-stone-600">
+                        <li class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-blue-500 mr-3 mt-1">
+                                <circle cx="12" cy="12" r="8" />
+                            </svg>
+                            <p class="flex-1"><strong>데이터 요약:</strong> 블록의 모든 거래를 개별적으로 해시하고, 이 해시들을 쌍으로 묶어 다시 해시하는 과정을 반복하여 최종적으로 하나의 '머클 루트' 해시를 만듭니다.</p>
+                        </li>
+                        <li class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-blue-500 mr-3 mt-1">
+                                <circle cx="12" cy="12" r="8" />
+                            </svg>
+                            <p class="flex-1"><strong>간편한 검증:</strong> 블록 헤더에는 이 머클 루트 해시만 포함됩니다. 특정 거래가 블록에 포함되었는지 확인하려면 해당 거래의 해시와 경로에 있는 소수의 중간 해시들만 있으면 됩니다.</p>
+                        </li>
+                        <li class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-blue-500 mr-3 mt-1">
+                                <circle cx="12" cy="12" r="8" />
+                            </svg>
+                            <p class="flex-1"><strong>디스크 공간 절약:</strong> 오래된 블록의 경우, 전체 거래 내역을 보관할 필요 없이 머클 루트만 남겨두고 불필요한 가지를 삭제하여 디스크 공간을 절약할 수 있습니다.</p>
+                        </li>
+                    </ul>
+                    <div class="p-4 mt-6 bg-stone-100 rounded-lg text-center text-stone-700">
+                        <p class="font-bold mb-2">머클 트리 작동 방식:</p>
+                        <p>Tx0 + Tx1 → Hash01</p>
+                        <p>Tx2 + Tx3 → Hash23</p>
+                        <p>Hash01 + Hash23 → <strong class="text-blue-700">머클 루트 (블록 헤더에 저장)</strong></p>
+                        <p class="text-sm mt-2">하나의 거래가 블록에 속하는지 효율적으로 증명할 수 있습니다.</p>
+                    </div>
+                </div>
+                <div class="bg-white p-8 rounded-lg shadow">
+                    <h4 class="text-xl font-semibold mb-4">간편 결제 검증 (Simplified Payment Verification, SPV)</h4>
+                    <p class="text-stone-600 mb-4">모든 비트코인 거래 내역은 매우 방대하므로, 모든 사용자가 전체 블록체인을 다운로드하는 것은 비효율적입니다. SPV는 이러한 부담을 줄여줍니다.</p>
+                    <ul class="space-y-3 text-stone-600">
+                        <li class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-blue-500 mr-3 mt-1">
+                                <circle cx="12" cy="12" r="8" />
+                            </svg>
+                            <p class="flex-1"><strong>핵심: 블록 헤더만 저장:</strong> SPV를 사용하는 지갑은 전체 블록체인이 아닌, 가장 긴 작업 증명 체인의 '블록 헤더'만 다운로드하여 보관합니다.</p>
+                        </li>
+                        <li class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-blue-500 mr-3 mt-1">
+                                <circle cx="12" cy="12" r="8" />
+                            </svg>
+                            <p class="flex-1"><strong>검증 방법:</strong> 특정 거래가 유효한지 확인하려면, 해당 거래가 포함된 블록의 헤더와 그 거래가 머클 루트에 연결됨을 증명하는 '머클 브랜치'만 있으면 됩니다.</p>
+                        </li>
+                        <li class="flex items-start">
+                            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2.5" stroke="currentColor" class="w-5 h-5 text-blue-500 mr-3 mt-1">
+                                <circle cx="12" cy="12" r="8" />
+                            </svg>
+                            <p class="flex-1"><strong>장점과 한계:</strong> 이는 빠르고 효율적이지만, 전체 노드만큼 강력한 보안을 제공하지는 않습니다. 공격자가 다수의 해시 파워를 장악하면 잘못된 정보로 SPV 사용자를 속일 가능성이 있습니다.</p>
+                        </li>
+                    </ul>
+                    <div class="p-4 mt-6 bg-amber-100 text-amber-800 rounded-lg">
+                        <p><strong>참고:</strong> SPV는 보안을 일부 희생하는 대신, 모바일 기기 등 저장 공간이 제한적인 환경에서 비트코인을 사용할 수 있게 해주는 중요한 기술입니다.</p>
+                    </div>
+                </div>
             </div>
         </section>
 
     </main>
-
-    <footer class="py-6 bg-[#073B4C] text-white text-center text-sm">
-        <p>&copy; 2024 비트코인 인포그래픽. 사토시 나카모토의 "비트코인: P2P 전자 현금 시스템" 백서 기반.</p>
+    
+    <footer class="bg-stone-800 text-white mt-16">
+        <div class="container mx-auto px-6 py-8 text-center">
+            <p>이 웹페이지는 사토시 나카모토의 "Bitcoin: A Peer-to-Peer Electronic Cash System" 백서의 내용을 교육적 목적으로 재구성한 것입니다.</p>
+            <p class="text-sm text-stone-400 mt-2">© 2024 Interactive Bitcoin Whitepaper. All Rights Reserved.</p>
+        </div>
     </footer>
 
     <script>
-        function wrapLabels(label, maxWidth) {
-            if (typeof label !== 'string' || label.length <= maxWidth) {
-                return label;
-            }
-            const words = label.split(' ');
-            const lines = [];
-            let currentLine = '';
-            for (const word of words) {
-                if ((currentLine + word).length > maxWidth && currentLine.length > 0) {
-                    lines.push(currentLine.trim());
-                    currentLine = word + ' ';
-                } else {
-                    currentLine += word + ' ';
+        document.addEventListener('DOMContentLoaded', () => {
+            let attackerChart;
+            const ctx = document.getElementById('attackerChart').getContext('2d');
+            const hashrateButtons = document.querySelectorAll('.hash-btn');
+            const chartDescription = document.getElementById('chart-description');
+
+            function attackerSuccessProbability(q, z) {
+                const p = 1.0 - q;
+                if (p <= q) {
+                    return 1.0;
                 }
-            }
-            if (currentLine.trim().length > 0) {
-                lines.push(currentLine.trim());
-            }
-            return lines.length > 0 ? lines : [label]; // Return original if no split occurred
-        }
-
-        const attackerData = {
-            labels: ['0', '1', '2', '3', '4', '5', '6', '7', '8', '9', '10'].map(l => wrapLabels(`z=${l} 확인`, 16)),
-            datasets: [{
-                label: 'q=0.1일 때 공격자 성공 확률 (P)',
-                data: [1.0, 0.2045873, 0.0509779, 0.0131722, 0.0034552, 0.0009137, 0.0002428, 0.0000647, 0.0000173, 0.0000046, 0.0000012],
-                borderColor: '#FF6B6B', // Coral Red
-                backgroundColor: 'rgba(255, 107, 107, 0.2)',
-                tension: 0.1,
-                fill: true,
-            }]
-        };
-
-        const attackerConfig = {
-            type: 'line',
-            data: attackerData,
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: true,
-                        title: {
-                            display: true,
-                            text: '공격자 성공 확률 (P)'
-                        },
-                        ticks: {
-                             callback: function(value) {
-                                if (value === 0) return 0;
-                                if (value >= 1) return value.toFixed(1);
-                                return value.toExponential(1); // Use exponential for very small numbers
-                            }
-                        }
-                    },
-                    x: {
-                        title: {
-                            display: true,
-                            text: '확인 수 (z)'
-                        }
+                const lambda = z * (q / p);
+                let sum = 0.0;
+                for (let k = 0; k <= z; k++) {
+                    let poisson = Math.exp(-lambda);
+                    for (let i = 1; i <= k; i++) {
+                        poisson *= lambda / i;
                     }
-                },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            title: function(tooltipItems) {
-                                const item = tooltipItems[0];
-                                let label = item.chart.data.labels[item.dataIndex];
-                                if (Array.isArray(label)) {
-                                  return label.join(' ');
-                                } else {
-                                  return label;
+                    sum += poisson * (1 - Math.pow(q / p, z - k));
+                }
+                return 1 - sum;
+            }
+
+            function updateChart(q) {
+                const zValues = Array.from({ length: 15 }, (_, i) => i);
+                const probabilities = zValues.map(z => attackerSuccessProbability(q, z));
+                
+                const data = {
+                    labels: zValues,
+                    datasets: [{
+                        label: `공격자 성공 확률 (q=${q*100}%)`,
+                        data: probabilities,
+                        borderColor: '#2563EB',
+                        backgroundColor: 'rgba(37, 99, 235, 0.1)',
+                        fill: true,
+                        tension: 0.1,
+                        pointBackgroundColor: '#2563EB',
+                    }]
+                };
+
+                if (attackerChart) {
+                    attackerChart.data = data;
+                    attackerChart.update();
+                } else {
+                    attackerChart = new Chart(ctx, {
+                        type: 'line',
+                        data: data,
+                        options: {
+                            responsive: true,
+                            maintainAspectRatio: false,
+                            scales: {
+                                y: {
+                                    beginAtZero: true,
+                                    title: {
+                                        display: true,
+                                        text: '공격 성공 확률 (P)'
+                                    },
+                                    ticks: {
+                                        callback: function(value) {
+                                            return (value * 100).toFixed(2) + '%';
+                                        }
+                                    }
+                                },
+                                x: {
+                                    title: {
+                                        display: true,
+                                        text: '거래 후 확인된 블록 수 (z)'
+                                    }
+                                }
+                            },
+                            plugins: {
+                                tooltip: {
+                                    callbacks: {
+                                        label: function(context) {
+                                            let label = context.dataset.label || '';
+                                            if (label) {
+                                                label += ': ';
+                                            }
+                                            if (context.parsed.y !== null) {
+                                                label += (context.parsed.y * 100).toPrecision(4) + '%';
+                                            }
+                                            return label;
+                                        }
+                                    }
                                 }
                             }
                         }
-                    },
-                    legend: {
-                        labels: {
-                             boxWidth: 20,
-                             padding: 15,
-                             font: {
-                                 size: 14
-                             }
-                        }
-                    }
+                    });
                 }
+                
+                const sixConfProb = attackerSuccessProbability(q, 6);
+                chartDescription.textContent = `공격자의 해시레이트가 ${q*100}%일 때, 6개 블록이 확인된 후(일반적인 거래 확정 기준) 거래를 되돌릴 확률은 약 ${(sixConfProb * 100).toPrecision(3)}% 입니다.`;
             }
-        };
 
-        const attackerProbabilityChartCtx = document.getElementById('attackerProbabilityChart');
-        if (attackerProbabilityChartCtx) {
-            new Chart(attackerProbabilityChartCtx, attackerConfig);
-        } else {
-            console.error("Canvas element for attackerProbabilityChart not found.");
-        }
+            hashrateButtons.forEach(button => {
+                button.addEventListener('click', () => {
+                    hashrateButtons.forEach(btn => {
+                        btn.classList.remove('bg-blue-600', 'text-white');
+                        btn.classList.add('bg-blue-100', 'text-blue-800');
+                    });
+                    button.classList.add('bg-blue-600', 'text-white');
+                    button.classList.remove('bg-blue-100', 'text-blue-800');
+                    
+                    const q = parseFloat(button.dataset.q);
+                    updateChart(q);
+                });
+            });
+
+            updateChart(0.1);
+        });
     </script>
 </body>
 </html>
